@@ -15,10 +15,10 @@ body {
 
 /* Sidebar */
 .sidebar {
-  width: 280px;
-  background: #556b7a;
+  width: 260px;
+  background: #1e2330;
   color: white;
-  padding: 20px 14px;
+  padding: 16px 10px;
   overflow-y: auto;
   height: 100vh;
   position: fixed;
@@ -27,58 +27,59 @@ body {
 }
 
 .sidebar h2 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f3f4f6;
 }
 
 .sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
 }
 
 /* Search */
 .sidebar input {
   width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
   color: white;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   outline: none;
+  font-size: 13px;
 }
 
 .sidebar input::placeholder {
-  color: #d1d5db;
+  color: #9ca3af;
+}
+
+.sidebar input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Main */
 .main-content {
-  margin-left: 280px;
+  margin-left: 260px;
   flex: 1;
   padding: 24px;
   min-height: 100vh;
   background: #eef1f5;
 }
 
-/* Text size */
-.sidebar a,
-.sidebar button {
-  font-size: 14px;
-}
-
 /* Scrollbar */
 .sidebar::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
 }
 
