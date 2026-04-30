@@ -1,155 +1,146 @@
-import { Briefcase, Award, FileText, BadgeCheck, Map, Users, Home, Banknote, GraduationCap, Hammer, Wallet, Mail, Plus, Book, PointerIcon, CircleDot, LucidePlusCircle, DotIcon, SpaceIcon, Dot, StickyNote, BoxIcon } from 'lucide-react';
+// src/data/NavItems.js
+import {
+  LayoutDashboard,
+  ClipboardList,
+  FileText,
+  Hospital,
+  BarChart3,
+} from "lucide-react";
 
 export const NAV_ITEMS = [
-    { id: 'dashboard', label: 'गृहपृष्ठ', icon: Home, children: [] },
-    {
-        id: 'application',
-        label: 'निवेदन',
-        icon: StickyNote,
-        children: [
-            'व्यवसाय दर्ता दरखास्त फारम', 'आदिवासी प्रमाणित सिफारिस', 'वृद्ध भत्ताको निवेदन',
-            'जग्गाको साँध सिमाङ्कन', 'फर्म खारेजी', 'विपन्न नागरिक आवेदन तथा सिफारिस',
-            'पतिको वतन कायम नागरिकताको प्रति‍लिपि new', 'पतिको नाम, थर, वतन कायम गरी नागरिकताको प्रति‍लिपि new',
-            'जनजाति प्रमाणित new', 'दलित जाति प्रमाणित new', 'खस आर्य जाति प्रमाणित new',
-            'नागरिकता प्रमाणपत्र शैक्षिक योग्यताको प्रमाणपत्र फरक', 'नागरिकता प्रमाणपत्र बुवा/आमाको नागरिकतामा फरक new',
-        ]
-    },
-    {
-        id: 'business-reg',
-        label: 'व्यवसाय दर्ता',
-        icon: Briefcase,
-        children: [
-            'व्यवसाय दर्ता (नयाँ)', 'व्यवसाय दर्ता (पुरानो वाला)', 'व्यवसाय दर्ता सूची',
-            'व्यवसाय दर्ता नविकरण वाकि सूची', 'व्यवसाय दर्ता नविकरण भइसकेको सूची',
-        ]
-    },
-    {
-        id: 'business-recommendation',
-        label: 'व्यवसाय सिफारिस',
-        icon: Award,
-        children: [
-            'व्यवसाय बन्द', 'व्यवसाय दर्ताको विवरण पठाइदिने बारे', 'पसल, कृषि, पक्षी फर्म/दर्ता मुचुल्का',
-            'पसल तथा फर्म दर्ता सिफारिस', 'उद्योगको दर्ता खारेजी', 'उद्योगको क्षमता परिवर्तन',
-            'उद्योग बन्द भएको जानकारी पत्र', 'उद्योग आवधिक विवरण', 'उद्योग स्थानन्तरण स्वीकृति अनुरोध',
-            'उद्योग स्थान्तरण स्वीकृति पत्र', 'उद्योग दर्ता सिफारिस', 'साझेदारी दर्ता आवेदन',
-            'नयाँ स्थायी लेखा नं', 'कारोबार थप स्थायी लेखा नं', 'कर चुक्ता प्रमाणपत्र',
-        ]
-    },
-    {
-        id: 'nepali-citizenship',
-        label: 'नेपाली नागरिकता',
-        icon: BadgeCheck,
-        children: [
-            'नागरिकता प्रतिलिपि सिफारिस', 'नागरिकताको लागि मुचुल्का', 'स्थलगत सर्जमिन मुचुल्का',
-            'नागरिकता प्रमाणपत्र सिफारिस', 'नागरिकता सिफारिस', 'नागरिकताको प्रमाण-पत्र प्रतिलिपि',
-            'नेपाली अंगीकृत नागरिकता', 'पतिको नाममा नेपाली नागरिकताको प्रमाण-पत्र',
-        ]
-    },
-    {
-        id: 'house-land',
-        label: 'घर / जग्गा जमिन',
-        icon: Map,
-        children: [
-            'जग्गा वर्गीकरण new', 'स्थलगत निरीक्षण new', 'घर जग्गा नामसारी सिफारिस (किटानी)',
-            'घर कायम सिफारिस', 'घर जग्गा नामसारी सिफारिस', 'घर जनाउने सिफारिस', 'कित्ताकाट सिफारिस',
-            'घरबाटो प्रमाणित', 'चार किल्ला सिफारिस', 'चार किल्ला खुलाई सिफारिस new',
-            'लालपुर्जाको प्रतिलिपि सिफारिस', 'जग्गाधनी प्रमाण पुर्जामा घर कायम सिफारिस', 'घर पाताल भएको सिफारिस',
-            'जोत भोग चलनको सिफारिस', 'चौहद्दी सिफारिस', 'भुकम्प प्रतिरोधि घर निर्माण सम्पन्न प्रमाणपत्र',
-            'आंशिक / पूर्ण घर निर्माण सम्पन्न प्रमाणपत्र', 'सम्पत्ति प्रमाणीकरण सिफारिस', 'जग्गा एकिकृत सिफारिस',
-            'घर कायम New Format',
-        ]
-    },
-    {
-        id: 'gov-organization',
-        label: 'सहकारी संस्था',
-        icon: Banknote,
-        children: [
-            'सहकारी संस्था दर्ता सिफारिस', 'सहकारी संस्था दर्ता सिफारिसको सूची',
-            'सहकारी संस्था दर्ता अस्वीकृत सूची', 'सहकारी संस्था दर्ता प्रमाण-पत्र सूची',
-        ]
-    },
-    {
-        id: 'educational',
-        label: 'शैक्षिक',
-        icon: GraduationCap,
-        children: ['छात्रवृत्ति सिफारिस', 'विपन्नता सिफारिस', 'कक्षा थप सिफारिस']
-    },
-    {
-        id: 'physical-development',
-        label: 'भौतिक निर्माण',
-        icon: Hammer,
-        children: ['धारा जडान सिफारिस', 'बिजुली जडान सिफारिस', 'नयाँ बिजुली जडान सिफारिस', 'विद्युत् क्षमता बढाउन सिफारिस', 'सडक खन्ने स्वीकृतिको सिफारिस', 'नेपाल सरकारको नाममा बाटो कायम सिफारिस', 'सडक सिफारिसको लागि भूमि कित्ताकाट', 'ससिचार विद्युत् मिटर जडान सिफारिस', 'निशुल्क विद्युत् जडान']
-    },
-    {
-        id: 'english-format',
-        label: 'English Format',
-        icon: FileText,
-        children: ['Relationship Verification', 'Scholarship Verification', 'Power of Attorney', 'Birth Date Verification', 'Occupation Verification', 'Unmarried Verification', 'Address Verification', 'Tax Clearance Certificate', 'Economic Status', 'Annual Income Certificate', 'Property Valuation Report', 'Marriage Certificate', 'Same Person Certificate', 'Certification of Occupation', 'Tax Clear Basic', 'Digital Verification', 'Occupation Verification New', 'Address Verification New', 'Birth Certification New', 'Verify Revised Emblem New', 'Tax Clearance New Format', 'Annual Income Verification New', 'Surname Verification Certificate', 'Surname Verification After Marriage']
-    },
-    {
-        id: 'economic',
-        label: 'आर्थिक',
-        icon: Wallet,
-        children: ['उपचारमा आर्थिक सहायता सिफारिस', 'अचल सम्पत्ति मुल्यांकन', 'कार्य योजना पूरा भयो सिफारिस', 'पेश्की अनुरोध सिफारिस', 'सामाजिक सुरक्षाको बैंक खाता', 'नयाँ लाभग्राहीको खाता खोल्न', 'सामाजिक सुरक्षा भत्ता रकम भुक्तानी गरि खाता बन्द गरिने', 'संरक्षक मार्फत सामाजिक सुरक्षा भत्ता उपलब्ध', 'लेखा परीक्षण']
-    },
-    {
-        id: 'social-family',
-        label: 'सामाजिक / पारिवारिक',
-        icon: Users,
-        children: ['पारिवारिक विवरण', 'अस्थायी बसोवास सिफारिस', 'अस्थायी बसोवास प्रमाणित', 'स्थायी बसोवास सिफारिस', 'विवाह प्रमाणित', 'जन्म मिति प्रमाणित', 'जन्म प्रमाणिकरण new', 'अविवाहित प्रमाणित', 'नाता प्रमाणित', 'नाता प्रमाणित प्रमाण पत्र new', 'तीन पुस्ते प्रमाणित', 'चालचलन सिफारिस', 'सामाजिक सुरक्षा सिफारिस', 'आन्तरिक बसाईँसराई सिफारिस', 'नाबालक परिचयपत्रको अनुसूची', 'नाबालक परिचय पत्र', 'मृतकका हकदारको सिफारिस', 'अपांग परिचय पत्र सिफारिस', 'जेष्ठ नागरिक सिफारिस', 'आदिवासी सिफारिस', 'जन्म / बसोबास प्रमाणित', 'मृतकको सामाजिक सुरक्षा भत्ता हकदारलाई', 'सामाजिक सुरक्षा भत्ता', 'निशुल्क स्वास्थ्य बिमा', 'आय श्रोत प्रमाणित', 'दोश्रो विवाह नगरेको सिफारिस', 'परिचय पत्र नविकरण', 'विपन्न सिफारिस', 'लाभग्राहीको लगत स्थानान्तरण', 'जातीय पहिचान सिफारिस']
-    },
-    {
-        id: 'open-format',
-        label: 'खुल्ला ढाँचा',
-        icon: Mail,
-        children: ['नेपाली भाषामा', 'अंग्रेजी भाषामा', 'खुल्ला निवेदन', 'सूचना अध्यावधिक', 'टिप्पणी new']
-    },
-    {
-        id: 'mrp',
-        label: 'MRP',
-        icon: Mail,
-        children: ['राहदानी प्रमाण पत्र']
-    },
-    {
-        id: 'others',
-        label: 'अन्य',
-        icon: Plus,
-        children: ['फरक फरक नाम र थर सिफारिस', 'फरक फरक जन्म मिति प्रमाणित', 'फरक फरक अंग्रेजी हिज्जे प्रमाणित', 'बिदाको निवेदन']
-    },
-    {
-        id: 'animal-husbandry',
-        label: 'पशुपालन',
-        icon: Plus,
-        children: ['गाई / भैंसी सुत्केरी पोषण भत्ता', 'पशु बिमा पाउँ']
-    },
-    {
-        id: 'identity-card',
-        label: 'प्रमाण–पत्र',
-        icon: StickyNote,
-        children: ['कृषक समूह/समिति दर्ता प्रमाण–पत्र', 'घ वर्गको निर्माण व्यवसाय इजाजत पत्र', 'निर्माण कार्य को पासबुक', 'घ वर्गको निर्माण व्यवसाय इजाजत पत्रको नवीकरण', 'उपभोक्ता संग दर्ता प्रमाणपत्र सूची', 'कृषक समूह/समिति दर्ता प्रमाण–पत्र सूची', 'भवन निर्माण प्रमाण–पत्र', 'खानेपानी उपभोक्ता संस्था दर्ता प्रमाण पत्र']
-    },
-    {
-        id: 'official-use',
-        label: 'आधिकारिक प्रयोग',
-        icon: Users,
-        children: ['अन्तर स्थानीय सरुवा new', 'रमाना पत्र new', 'कार्यवाहक तोकिएको सिफारिस', 'सूचना विवरण सूची']
-    },
-    {
-        id: 'planning',
-        label: 'योजना',
-        icon: Users,
-        children: ['योजना सम्झौताकॊ सिफारिस', 'रकम निकाशाको सिफारिस']
-    },
-    {
-        id: 'report',
-        label: 'रिपोर्ट',
-        icon: Book,
-        children: ['कोटीको आधारमा रिपोर्ट हेर्नुहोस्', 'कोटीको आधारमा सूची हेर्नुहोस्', 'अस्वीकृत अपाङ्गता परिचयपत्रको सूची', 'अस्वीकृत जेष्ठ नागरिक परिचयपत्रको सूची', 'परिचय–पत्र नवीकरण सूची']
-    },
-    {
-        id: 'daily-work-execute',
-        label: 'दैनिक कार्य सम्पादन',
-        icon: BoxIcon,
-        children: []
-    },
+  {
+    id: "dashboard",
+    label: "गृहपृष्ठ",
+    icon: LayoutDashboard,
+    path: "/dashboard",
+    children: [],
+  },
+
+  {
+    id: "ayurveda-register",
+    label: "आयुर्वेद सेवा रजिस्टर",
+    icon: ClipboardList,
+    path: "#",
+    children: [
+      { type: "title", label: "पञ्चकर्म सेवा रजिस्टर :" },
+      { type: "link", label: "दर्ता", path: "/pancha-create" },
+      { type: "link", label: "दैनिक सूची", path: "/pancha-list" },
+
+      { type: "title", label: "धारासुत्र सेवा रजिस्टर :" },
+      { type: "link", label: "दर्ता", path: "/ksharsutra-create" },
+      { type: "link", label: "दैनिक सूची", path: "/ksharsutra" },
+
+      { type: "title", label: "उपचारात्मक योग सेवा रजिस्टर :" },
+      { type: "link", label: "दर्ता", path: "/therapy-create" },
+      { type: "link", label: "दैनिक सूची", path: "/therapy-list" },
+
+      { type: "title", label: "जेष्ठ नागरिक सेवा रजिस्टर :" },
+      { type: "link", label: "दर्ता", path: "/jestha-create" },
+      { type: "link", label: "दैनिक सूची", path: "/jestha-list" },
+
+      { type: "title", label: "स्तनपायी आमा तथा शिशु सेवा रजिस्टर :" },
+      { type: "link", label: "दर्ता", path: "/maternal-create" },
+      { type: "link", label: "दैनिक सूची", path: "/maternal-list" },
+
+      { type: "title", label: "फिजियोथेरेपी सेवा रजिस्टर :" },
+      { type: "link", label: "सूचना", path: "/physio-create" },
+      { type: "link", label: "दैनिक सूची", path: "/physio-list" },
+
+      { type: "title", label: "अकुपुन्चर सेवा रजिस्टर :" },
+      { type: "link", label: "सूचना", path: "/aku-create" },
+      { type: "link", label: "दैनिक सूची", path: "/aku-list" },
+
+      { type: "title", label: "शल्य चिकित्सा सेवा रजिस्टर :" },
+      { type: "link", label: "सूचना", path: "/surgery-create" },
+      { type: "link", label: "दैनिक सूची", path: "/surgery-list" },
+    ],
+  },
+
+  {
+    id: "common-forms",
+    label: "साझा अभिलेख फारामहरु",
+    icon: FileText,
+    path: "#",
+    children: [
+      { type: "title", label: "मूल दर्ता रजिस्टर :" },
+      { type: "link", label: "दर्ता", path: "/master-create" },
+      { type: "link", label: "दैनिक सूची", path: "/master-list" },
+
+      { type: "link", label: "थप सेवा बिलिङ दर्ता", path: "/billing-create" },
+      {
+        type: "link",
+        label: "थप सेवा बिलिङ दैनिक सूची",
+        path: "/billing-list",
+      },
+
+      { type: "title", label: "प्रेषण / स्थानान्तरण पुर्जा :" },
+      { type: "link", label: "दर्ता", path: "/referral" },
+      { type: "link", label: "दैनिक सूची", path: "/referral-list" },
+
+      { type: "title", label: "फिर्ता पुर्जा :" },
+      { type: "link", label: "दर्ता", path: "/return-slip" },
+      { type: "link", label: "दैनिक सूची", path: "/return-list" },
+    ],
+  },
+
+  {
+    id: "hospital-registration",
+    label: "अस्पताल सेवा दर्ता",
+    icon: Hospital,
+    path: "#",
+    children: [
+      { type: "title", label: "बिरामी प्रवेश र डिस्चार्ज दर्ता :" },
+      { type: "link", label: "सूचना", path: "/patient-admission" },
+      { type: "link", label: "दैनिक सूची", path: "/patient-admission-list" },
+
+      { type: "title", label: "आपतकालीन सेवा दर्ता :" },
+      { type: "link", label: "सूचना", path: "/emergency-create" },
+      { type: "link", label: "दैनिक सूची", path: "/emergency-list" },
+    ],
+  },
+
+  {
+    id: "reports",
+    label: "रिपोर्ट",
+    icon: BarChart3,
+    path: "#",
+    children: [
+      { type: "link", label: "सेवा बिल सूची", path: "/service-report" },
+      {
+        type: "link",
+        label: "सेवा बिल फिर्ती प्रतिवेदन",
+        path: "/return-report",
+      },
+      { type: "link", label: "Hospital Reporting 1", path: "/hospital-report" },
+      { type: "link", label: "Hospital Reporting 2", path: "/hospital-report" },
+      { type: "link", label: "मूल दर्ता प्रतिवेदन", path: "/master-report-1" },
+      {
+        type: "link",
+        label: "मूल दर्ता प्रतिवेदन २",
+        path: "/master-report-2",
+      },
+      { type: "link", label: "योग सेवा प्रतिवेदन", path: "/therapy-report" },
+      {
+        type: "link",
+        label: "जेष्ठ नागरिक सेवा प्रतिवेदन",
+        path: "/elder-report",
+      },
+      {
+        type: "link",
+        label: "स्तनपायी आमा तथा शिशु सेवा प्रतिवेदन",
+        path: "/maternal-report",
+      },
+      {
+        type: "link",
+        label: "फिजियोथेरेपी सेवा प्रतिवेदन",
+        path: "/physio-report",
+      },
+      { type: "link", label: "अकुपुन्चर सेवा प्रतिवेदन", path: "/aku-report" },
+      {
+        type: "link",
+        label: "शल्य चिकित्सा सेवा प्रतिवेदन",
+        path: "/surgery-report",
+      },
+    ],
+  },
 ];
