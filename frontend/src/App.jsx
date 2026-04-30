@@ -117,8 +117,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Login */}
-        <Route path="/" element={<Login />} />
+        {/* Login Disabled for Now */}
+        {/* <Route path="/" element={<Login />} /> */}
+
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {/* Protected Layout */}
         <Route path="/" element={<Layout />}>

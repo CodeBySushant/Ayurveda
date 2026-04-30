@@ -62,7 +62,7 @@ const SidebarItem = ({
                 className: "text-gray-400",
               })}
 
-            <span className="text-sm">{item.label}</span>
+            <span className="text-[15px] leading-6">{item.label}</span>
           </div>
 
           {isOpen || searchTerm ? (
@@ -98,7 +98,7 @@ const SidebarItem = ({
               <Link
                 key={`${item.id}-link-${index}`}
                 to={child.path}
-                className={`block px-4 py-2 text-sm transition rounded-r-lg
+                className={`block px-4 py-2 text-[15px] leading-6 transition rounded-r-lg
                 ${
                   activeLink === child.path
                     ? "bg-gray-800 text-blue-400"
@@ -131,7 +131,7 @@ const SidebarItem = ({
           className: "text-gray-400",
         })}
 
-      <span className="text-sm">{item.label}</span>
+      <span className="text-[15px] leading-6">{item.label}</span>
     </Link>
   );
 };
