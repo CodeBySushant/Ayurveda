@@ -17,6 +17,33 @@ export const NAV_ITEMS = [
   },
 
   {
+    id: "common-forms",
+    label: "साझा अभिलेख फारामहरु",
+    icon: FileText,
+    path: "#",
+    children: [
+      { type: "title", label: "मूल दर्ता रजिस्टर :" },
+      { type: "link", label: "दर्ता", path: "/master-create" },
+      { type: "link", label: "दैनिक सूची", path: "/master-list" },
+
+      { type: "link", label: "थप सेवा बिलिङ दर्ता", path: "/billing-create" },
+      {
+        type: "link",
+        label: "थप सेवा बिलिङ दैनिक सूची",
+        path: "/billing-list",
+      },
+
+      { type: "title", label: "प्रेषण / स्थानान्तरण पुर्जा :" },
+      { type: "link", label: "दर्ता", path: "/referral" },
+      { type: "link", label: "दैनिक सूची", path: "/referral-list" },
+
+      { type: "title", label: "फिर्ता पुर्जा :" },
+      { type: "link", label: "दर्ता", path: "/return-slip" },
+      { type: "link", label: "दैनिक सूची", path: "/return-list" },
+    ],
+  },
+
+  {
     id: "ayurveda-register",
     label: "आयुर्वेद सेवा रजिस्टर",
     icon: ClipboardList,
@@ -53,33 +80,6 @@ export const NAV_ITEMS = [
       { type: "title", label: "शल्य चिकित्सा सेवा रजिस्टर :" },
       { type: "link", label: "सूचना", path: "/surgery-create" },
       { type: "link", label: "दैनिक सूची", path: "/surgery-list" },
-    ],
-  },
-
-  {
-    id: "common-forms",
-    label: "साझा अभिलेख फारामहरु",
-    icon: FileText,
-    path: "#",
-    children: [
-      { type: "title", label: "मूल दर्ता रजिस्टर :" },
-      { type: "link", label: "दर्ता", path: "/master-create" },
-      { type: "link", label: "दैनिक सूची", path: "/master-list" },
-
-      { type: "link", label: "थप सेवा बिलिङ दर्ता", path: "/billing-create" },
-      {
-        type: "link",
-        label: "थप सेवा बिलिङ दैनिक सूची",
-        path: "/billing-list",
-      },
-
-      { type: "title", label: "प्रेषण / स्थानान्तरण पुर्जा :" },
-      { type: "link", label: "दर्ता", path: "/referral" },
-      { type: "link", label: "दैनिक सूची", path: "/referral-list" },
-
-      { type: "title", label: "फिर्ता पुर्जा :" },
-      { type: "link", label: "दर्ता", path: "/return-slip" },
-      { type: "link", label: "दैनिक सूची", path: "/return-list" },
     ],
   },
 

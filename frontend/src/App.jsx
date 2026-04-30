@@ -70,6 +70,7 @@ import TherapeuticServiceReport from "./pages/Report/TherapeuticServiceReport";
 function Layout() {
   const [openMenu, setOpenMenu] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const location = useLocation();
   const activeLink = location.pathname;
@@ -80,17 +81,65 @@ function Layout() {
 
   return (
     <div className="app-layout">
-      <aside className="sidebar">
-        <h2>Ayurveda System</h2>
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
+        
+        {/* Header: Logo + Title */}
+        <div className="sidebar-header">
+          {sidebarOpen && (
+            <>
+              {/* Ayurveda Leaf + Mortar Icon (SVG) */}
+              <div className="sidebar-logo">
+                <svg viewBox="0 0 40 40" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Mortar bowl */}
+                  <ellipse cx="20" cy="28" rx="11" ry="5" fill="#4ade80" opacity="0.3"/>
+                  <path d="M10 26 Q20 36 30 26" stroke="#4ade80" strokeWidth="2" fill="none"/>
+                  {/* Pestle */}
+                  <line x1="27" y1="18" x2="20" y2="28" stroke="#86efac" strokeWidth="2.5" strokeLinecap="round"/>
+                  {/* Left leaf */}
+                  <path d="M20 22 Q10 14 12 6 Q18 10 20 22Z" fill="#22c55e" opacity="0.9"/>
+                  {/* Right leaf */}
+                  <path d="M20 22 Q30 14 28 6 Q22 10 20 22Z" fill="#16a34a" opacity="0.85"/>
+                  {/* Center vein left leaf */}
+                  <path d="M16 8 Q18 14 20 22" stroke="#bbf7d0" strokeWidth="0.8" fill="none" opacity="0.7"/>
+                  {/* Center vein right leaf */}
+                  <path d="M24 8 Q22 14 20 22" stroke="#bbf7d0" strokeWidth="0.8" fill="none" opacity="0.7"/>
+                  {/* Plus sign */}
+                  <circle cx="30" cy="10" r="6" fill="#2563eb" opacity="0.9"/>
+                  <line x1="30" y1="7" x2="30" y2="13" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
+                  <line x1="27" y1="10" x2="33" y2="10" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <span className="sidebar-title">Ayurveda System</span>
+            </>
+          )}
 
-        <input
-          type="text"
-          placeholder="मेनु खोज्नुहोस्..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-2 mb-3 rounded bg-gray-800 text-white"
-        />
+          {/* Toggle Button */}
+          <button
+            className="sidebar-toggle-btn"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
 
+        {/* Search — only when open */}
+        {sidebarOpen && (
+          <input
+            type="text"
+            placeholder="मेनु खोज्नुहोस्..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="sidebar-search"
+          />
+        )}
+
+        {/* Nav */}
         <nav>
           {NAV_ITEMS.map((item) => (
             <SidebarItem
@@ -100,12 +149,14 @@ function Layout() {
               handleToggle={handleToggle}
               searchTerm={searchTerm}
               activeLink={activeLink}
+              collapsed={!sidebarOpen}
             />
           ))}
         </nav>
       </aside>
 
-      <main className="main-content">
+      {/* Main */}
+      <main className={`main-content ${sidebarOpen ? "main-expanded" : "main-collapsed"}`}>
         <Outlet />
       </main>
     </div>
@@ -122,106 +173,42 @@ export default function App() {
 
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* Protected Layout */}
         <Route path="/" element={<Layout />}>
           <Route path="dashboard" element={<Dashboard />} />
 
           {/* Ayurveda Register */}
-          <Route
-            path="aku-create"
-            element={<AkupancharServiceRegisterCreate />}
-          />
-          <Route
-            path="aku-list"
-            element={<AkupancharServiceRegisterDailyList />}
-          />
-          <Route
-            path="jestha-create"
-            element={<JesthaNagarikRegisterCreate />}
-          />
-          <Route
-            path="jestha-list"
-            element={<JesthaNagarikRegisterDailyList />}
-          />
+          <Route path="aku-create" element={<AkupancharServiceRegisterCreate />} />
+          <Route path="aku-list" element={<AkupancharServiceRegisterDailyList />} />
+          <Route path="jestha-create" element={<JesthaNagarikRegisterCreate />} />
+          <Route path="jestha-list" element={<JesthaNagarikRegisterDailyList />} />
           <Route path="ksharsutra" element={<KsharsutraServiceIndex />} />
-          <Route
-            path="ksharsutra-create"
-            element={<KsharsutraServiceRegisterCreate />}
-          />
-          <Route
-            path="maternal-create"
-            element={<MaternalAndChildHealthRegisterCreate />}
-          />
-          <Route
-            path="maternal-list"
-            element={<MaternalAndChildHealthRegisterDailyList />}
-          />
-          <Route
-            path="pancha-create"
-            element={<PanchaKarmaServiceRegisterCreate />}
-          />
-          <Route
-            path="pancha-list"
-            element={<PanchaKarmaServiceRegisterDailyList />}
-          />
-          <Route
-            path="physio-create"
-            element={<PhysiotherapyServiceRegisterCreate />}
-          />
-          <Route
-            path="physio-list"
-            element={<PhysiotherapyServiceRegisterDailyList />}
-          />
-          <Route
-            path="surgery-create"
-            element={<SurgeryServiceRegisterCreate />}
-          />
-          <Route
-            path="surgery-list"
-            element={<SurgeryServiceRegisterDailyList />}
-          />
-          <Route
-            path="therapy-create"
-            element={<TherapeuticServiceRegisterCreate />}
-          />
-          <Route
-            path="therapy-list"
-            element={<TherapeuticServiceRegisterDailyList />}
-          />
+          <Route path="ksharsutra-create" element={<KsharsutraServiceRegisterCreate />} />
+          <Route path="maternal-create" element={<MaternalAndChildHealthRegisterCreate />} />
+          <Route path="maternal-list" element={<MaternalAndChildHealthRegisterDailyList />} />
+          <Route path="pancha-create" element={<PanchaKarmaServiceRegisterCreate />} />
+          <Route path="pancha-list" element={<PanchaKarmaServiceRegisterDailyList />} />
+          <Route path="physio-create" element={<PhysiotherapyServiceRegisterCreate />} />
+          <Route path="physio-list" element={<PhysiotherapyServiceRegisterDailyList />} />
+          <Route path="surgery-create" element={<SurgeryServiceRegisterCreate />} />
+          <Route path="surgery-list" element={<SurgeryServiceRegisterDailyList />} />
+          <Route path="therapy-create" element={<TherapeuticServiceRegisterCreate />} />
+          <Route path="therapy-list" element={<TherapeuticServiceRegisterDailyList />} />
 
           {/* Common Forms */}
           <Route path="master-create" element={<MasterRegisterCreate />} />
           <Route path="master-list" element={<MasterRegisterDailyList />} />
-          <Route
-            path="billing-create"
-            element={<AdditionalServiceBillingCreate />}
-          />
-          <Route
-            path="billing-list"
-            element={<AdditionalServiceBillingDailyList />}
-          />
+          <Route path="billing-create" element={<AdditionalServiceBillingCreate />} />
+          <Route path="billing-list" element={<AdditionalServiceBillingDailyList />} />
           <Route path="referral" element={<ReferralSlip />} />
           <Route path="referral-list" element={<ReferralSlipList />} />
           <Route path="return-slip" element={<ReturnSlip />} />
           <Route path="return-list" element={<ReturnSlipDailyList />} />
 
           {/* Hospital */}
-          <Route
-            path="emergency-create"
-            element={<EmergencyServiceRegisterCreate />}
-          />
-          <Route
-            path="emergency-list"
-            element={<EmergencyServiceRegisterDailyList />}
-          />
-          <Route
-            path="patient-admission"
-            element={<PatientAdmissionRegister />}
-          />
-          <Route
-            path="patient-admission-list"
-            element={<PatientAdmissionRegisterIndex />}
-          />
+          <Route path="emergency-create" element={<EmergencyServiceRegisterCreate />} />
+          <Route path="emergency-list" element={<EmergencyServiceRegisterDailyList />} />
+          <Route path="patient-admission" element={<PatientAdmissionRegister />} />
+          <Route path="patient-admission-list" element={<PatientAdmissionRegisterIndex />} />
 
           {/* Reports */}
           <Route path="aku-report" element={<AkupancharServiceReport />} />
@@ -231,16 +218,12 @@ export default function App() {
           <Route path="master-report-1" element={<MasterRegisterReport1 />} />
           <Route path="master-report-2" element={<MasterRegisterReport2 />} />
           <Route path="maternal-report" element={<MaternalAndChildReport />} />
-          <Route
-            path="physio-report"
-            element={<PhysiotherapyServiceReport />}
-          />
+          <Route path="physio-report" element={<PhysiotherapyServiceReport />} />
           <Route path="return-report" element={<ReturnServiceBillingList />} />
           <Route path="service-report" element={<ServiceBillingList />} />
           <Route path="surgery-report" element={<SurgeryServiceReport />} />
           <Route path="therapy-report" element={<TherapeuticServiceReport />} />
 
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
