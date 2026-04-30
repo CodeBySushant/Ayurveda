@@ -1,122 +1,165 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// src/App.jsx
+import React from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Link,
+  Outlet,
+} from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+import "./App.css";
 
+/* Core Pages */
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+
+/* Ayurveda Service Register */
+import AkupancharServiceRegisterCreate from "./pages/AyurvedaServiceRegister/AkupancharServiceRegisterCreate";
+import AkupancharServiceRegisterDailyList from "./pages/AyurvedaServiceRegister/AkupancharServiceRegisterDailyList";
+import JesthaNagarikRegisterCreate from "./pages/AyurvedaServiceRegister/JesthaNagarikRegisterCreate";
+import JesthaNagarikRegisterDailyList from "./pages/AyurvedaServiceRegister/JesthaNagarikRegisterDailyList";
+import KsharsutraServiceIndex from "./pages/AyurvedaServiceRegister/KsharsutraServiceIndex";
+import KsharsutraServiceRegisterCreate from "./pages/AyurvedaServiceRegister/KsharsutraServiceRegisterCreate";
+import MaternalAndChildHealthRegisterCreate from "./pages/AyurvedaServiceRegister/MaternalAndChildHealthRegisterCreate";
+import MaternalAndChildHealthRegisterDailyList from "./pages/AyurvedaServiceRegister/MaternalAndChildHealthRegisterDailyList";
+import PanchaKarmaServiceRegisterCreate from "./pages/AyurvedaServiceRegister/PanchaKarmaServiceRegisterCreate";
+import PanchaKarmaServiceRegisterDailyList from "./pages/AyurvedaServiceRegister/PanchaKarmaServiceRegisterDailyList";
+import PhysiotherapyServiceRegisterCreate from "./pages/AyurvedaServiceRegister/PhysiotherapyServiceRegisterCreate";
+import PhysiotherapyServiceRegisterDailyList from "./pages/AyurvedaServiceRegister/PhysiotherapyServiceRegisterDailyList";
+import SurgeryServiceRegisterCreate from "./pages/AyurvedaServiceRegister/SurgeryServiceRegisterCreate";
+import SurgeryServiceRegisterDailyList from "./pages/AyurvedaServiceRegister/SurgeryServiceRegisterDailyList";
+import TherapeuticServiceRegisterCreate from "./pages/AyurvedaServiceRegister/TherapeuticServiceRegisterCreate";
+import TherapeuticServiceRegisterDailyList from "./pages/AyurvedaServiceRegister/TherapeuticServiceRegisterDailyList";
+
+/* Common Forms */
+import AdditionalServiceBillingCreate from "./pages/CommonForms/AdditionalServiceBillingCreate";
+import AdditionalServiceBillingDailyList from "./pages/CommonForms/AdditionalServiceBillingDailyList";
+import MasterRegisterCreate from "./pages/CommonForms/MasterRegisterCreate";
+import MasterRegisterDailyList from "./pages/CommonForms/MasterRegisterDailyList";
+import ReferralSlip from "./pages/CommonForms/ReferralSlip";
+import ReferralSlipList from "./pages/CommonForms/ReferralSlipList";
+import ReturnSlip from "./pages/CommonForms/ReturnSlip";
+import ReturnSlipDailyList from "./pages/CommonForms/ReturnSlipDailyList";
+
+/* Hospital Registration */
+import EmergencyServiceRegisterCreate from "./pages/HospitalRegistration/EmergencyServiceRegisterCreate";
+import EmergencyServiceRegisterDailyList from "./pages/HospitalRegistration/EmergencyServiceRegisterDailyList";
+import PatientAdmissionRegister from "./pages/HospitalRegistration/PatientAdmissionRegister";
+import PatientAdmissionRegisterIndex from "./pages/HospitalRegistration/PatientAdmissionRegisterIndex";
+
+/* Reports */
+import AkupancharServiceReport from "./pages/Report/AkupancharServiceReport";
+import DailyCollectionReport from "./pages/Report/DailyCollectionReport";
+import ElderPersonServiceReport from "./pages/Report/ElderPersonServiceReport";
+import HospitalMorbidityReport from "./pages/Report/HospitalMorbidityReport";
+import MasterRegisterReport1 from "./pages/Report/MasterRegisterReport1";
+import MasterRegisterReport2 from "./pages/Report/MasterRegisterReport2";
+import MaternalAndChildReport from "./pages/Report/MaternalAndChildReport";
+import PhysiotherapyServiceReport from "./pages/Report/PhysiotherapyServiceReport";
+import ReturnServiceBillingList from "./pages/Report/ReturnServiceBillingList";
+import ServiceBillingList from "./pages/Report/ServiceBillingList";
+import SurgeryServiceReport from "./pages/Report/SurgeryServiceReport";
+import TherapeuticServiceReport from "./pages/Report/TherapeuticServiceReport";
+
+/* ---------------- Layout ---------------- */
+function Layout() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-layout">
+      <aside className="sidebar">
+        <h2>Ayurveda System</h2>
 
-      <div className="ticks"></div>
+        <nav>
+          <Link to="/dashboard">Dashboard</Link>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <p className="menu-title">Ayurveda Register</p>
+          <Link to="/aku-create">Akupanchar Create</Link>
+          <Link to="/aku-list">Akupanchar List</Link>
+          <Link to="/master-create">Master Register</Link>
+          <Link to="/master-list">Master Register List</Link>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <p className="menu-title">Hospital</p>
+          <Link to="/emergency-create">Emergency Entry</Link>
+          <Link to="/patient-admission">Patient Admission</Link>
+
+          <p className="menu-title">Reports</p>
+          <Link to="/daily-report">Daily Collection</Link>
+          <Link to="/hospital-report">Hospital Report</Link>
+        </nav>
+      </aside>
+
+      <main className="main-content">
+        <Outlet />
+      </main>
+    </div>
+  );
 }
 
-export default App
+/* ---------------- App ---------------- */
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Login */}
+        <Route path="/" element={<Login />} />
+
+        {/* Protected Layout */}
+        <Route path="/" element={<Layout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+
+          {/* Ayurveda Register */}
+          <Route path="aku-create" element={<AkupancharServiceRegisterCreate />} />
+          <Route path="aku-list" element={<AkupancharServiceRegisterDailyList />} />
+          <Route path="jestha-create" element={<JesthaNagarikRegisterCreate />} />
+          <Route path="jestha-list" element={<JesthaNagarikRegisterDailyList />} />
+          <Route path="ksharsutra" element={<KsharsutraServiceIndex />} />
+          <Route path="ksharsutra-create" element={<KsharsutraServiceRegisterCreate />} />
+          <Route path="maternal-create" element={<MaternalAndChildHealthRegisterCreate />} />
+          <Route path="maternal-list" element={<MaternalAndChildHealthRegisterDailyList />} />
+          <Route path="pancha-create" element={<PanchaKarmaServiceRegisterCreate />} />
+          <Route path="pancha-list" element={<PanchaKarmaServiceRegisterDailyList />} />
+          <Route path="physio-create" element={<PhysiotherapyServiceRegisterCreate />} />
+          <Route path="physio-list" element={<PhysiotherapyServiceRegisterDailyList />} />
+          <Route path="surgery-create" element={<SurgeryServiceRegisterCreate />} />
+          <Route path="surgery-list" element={<SurgeryServiceRegisterDailyList />} />
+          <Route path="therapy-create" element={<TherapeuticServiceRegisterCreate />} />
+          <Route path="therapy-list" element={<TherapeuticServiceRegisterDailyList />} />
+
+          {/* Common Forms */}
+          <Route path="master-create" element={<MasterRegisterCreate />} />
+          <Route path="master-list" element={<MasterRegisterDailyList />} />
+          <Route path="billing-create" element={<AdditionalServiceBillingCreate />} />
+          <Route path="billing-list" element={<AdditionalServiceBillingDailyList />} />
+          <Route path="referral" element={<ReferralSlip />} />
+          <Route path="referral-list" element={<ReferralSlipList />} />
+          <Route path="return-slip" element={<ReturnSlip />} />
+          <Route path="return-list" element={<ReturnSlipDailyList />} />
+
+          {/* Hospital */}
+          <Route path="emergency-create" element={<EmergencyServiceRegisterCreate />} />
+          <Route path="emergency-list" element={<EmergencyServiceRegisterDailyList />} />
+          <Route path="patient-admission" element={<PatientAdmissionRegister />} />
+          <Route path="patient-admission-list" element={<PatientAdmissionRegisterIndex />} />
+
+          {/* Reports */}
+          <Route path="aku-report" element={<AkupancharServiceReport />} />
+          <Route path="daily-report" element={<DailyCollectionReport />} />
+          <Route path="elder-report" element={<ElderPersonServiceReport />} />
+          <Route path="hospital-report" element={<HospitalMorbidityReport />} />
+          <Route path="master-report-1" element={<MasterRegisterReport1 />} />
+          <Route path="master-report-2" element={<MasterRegisterReport2 />} />
+          <Route path="maternal-report" element={<MaternalAndChildReport />} />
+          <Route path="physio-report" element={<PhysiotherapyServiceReport />} />
+          <Route path="return-report" element={<ReturnServiceBillingList />} />
+          <Route path="service-report" element={<ServiceBillingList />} />
+          <Route path="surgery-report" element={<SurgeryServiceReport />} />
+          <Route path="therapy-report" element={<TherapeuticServiceReport />} />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
