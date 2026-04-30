@@ -110,7 +110,7 @@ function Layout() {
                   <line x1="27" y1="10" x2="33" y2="10" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
                 </svg>
               </div>
-              <span className="sidebar-title">Ayurveda System</span>
+              <span className="sidebar-title">आयुर्वेद रिपोर्टिंङ्ग प्रणाली</span>
             </>
           )}
 
