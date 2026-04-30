@@ -37,16 +37,15 @@ const SidebarItem = ({
 
   const shouldBeOpen = isOpen || (searchTerm !== "" && hasVisibleLinks);
 
-  /* ── COLLAPSED MODE: icon + short label only ── */
+  const FolderIcon = ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
+    </svg>
+  );
+
+  /* ── COLLAPSED MODE ── */
   if (collapsed) {
     const isActive = activeLink === item.path || isParentActive;
-
-    const FolderIcon = () => (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
-      </svg>
-    );
-
     return (
       <div
         title={item.label}
@@ -56,14 +55,14 @@ const SidebarItem = ({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "8px 4px",
+          padding: "10px 4px",
           cursor: "pointer",
           borderRadius: "8px",
           background: isActive ? "rgba(147,197,253,0.12)" : "transparent",
           color: isActive ? "#93c5fd" : "#9ca3af",
           transition: "background 0.15s, color 0.15s",
           gap: "5px",
-          minHeight: "52px",
+          minHeight: "56px",
         }}
         onMouseEnter={(e) => {
           if (!isActive) {
@@ -80,13 +79,13 @@ const SidebarItem = ({
       >
         {item.icon
           ? React.createElement(item.icon, { size: 20, style: { flexShrink: 0 } })
-          : <FolderIcon />
+          : <FolderIcon size={20} />
         }
         <span style={{
           fontSize: "9px",
           lineHeight: "1.2",
           textAlign: "center",
-          width: "52px",
+          width: "56px",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -99,12 +98,6 @@ const SidebarItem = ({
   }
 
   /* ── EXPANDED: Parent With Children ── */
-  const FolderIconSmall = () => (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>
-    </svg>
-  );
-
   if (hasChildren) {
     return (
       <div style={{ marginBottom: "2px" }}>
@@ -115,7 +108,7 @@ const SidebarItem = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "10px 14px",
+            padding: "14px 18px",
             borderRadius: "8px",
             border: "none",
             cursor: "pointer",
@@ -126,10 +119,10 @@ const SidebarItem = ({
           onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
           onMouseLeave={(e) => (e.currentTarget.style.background = shouldBeOpen ? "rgba(255,255,255,0.12)" : "transparent")}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             {item.icon
-              ? React.createElement(item.icon, { size: 17, style: { color: "#9ca3af", flexShrink: 0 } })
-              : <FolderIconSmall />
+              ? React.createElement(item.icon, { size: 18, style: { color: "#9ca3af", flexShrink: 0 } })
+              : <FolderIcon size={18} />
             }
             <span style={{ fontSize: "14px", lineHeight: "1.5", textAlign: "left" }}>
               {item.label}
@@ -143,17 +136,17 @@ const SidebarItem = ({
 
         {shouldBeOpen && (
           <div style={{
-            marginLeft: "14px",
-            paddingLeft: "12px",
+            marginLeft: "16px",
+            paddingLeft: "14px",
             borderLeft: "1px solid rgba(255,255,255,0.15)",
             marginTop: "2px",
-            marginBottom: "4px",
+            marginBottom: "6px",
           }}>
             {filteredChildren.map((child, index) => {
               if (child.type === "title") {
                 return (
                   <div key={`${item.id}-title-${index}`} style={{
-                    padding: "10px 10px 4px",
+                    padding: "14px 12px 6px",
                     fontSize: "11px",
                     fontWeight: "600",
                     color: "#6b7280",
@@ -172,8 +165,8 @@ const SidebarItem = ({
                   to={child.path}
                   style={{
                     display: "block",
-                    padding: "8px 12px",
-                    fontSize: "13.5px",
+                    padding: "12px 16px",
+                    fontSize: "14px",
                     lineHeight: "1.5",
                     borderRadius: "0 8px 8px 0",
                     textDecoration: "none",
@@ -212,8 +205,8 @@ const SidebarItem = ({
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "10px",
-        padding: "10px 14px",
+        gap: "12px",
+        padding: "14px 18px",
         borderRadius: "8px",
         textDecoration: "none",
         color: isActive ? "#93c5fd" : "#e5e7eb",
@@ -225,8 +218,8 @@ const SidebarItem = ({
       onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
     >
       {item.icon
-        ? React.createElement(item.icon, { size: 17, style: { color: "#9ca3af", flexShrink: 0 } })
-        : <FolderIconSmall />
+        ? React.createElement(item.icon, { size: 18, style: { color: "#9ca3af", flexShrink: 0 } })
+        : <FolderIcon size={18} />
       }
       <span style={{ fontSize: "14px", lineHeight: "1.5" }}>{item.label}</span>
     </Link>
