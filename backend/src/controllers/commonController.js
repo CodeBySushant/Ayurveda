@@ -1,4 +1,5 @@
 const masterRegisterModel = require("../models/masterRegisterModel");
+const billingModel = require("../models/billingModel");
 
 /* Create */
 const createMasterRegister = (req, res) => {
@@ -94,11 +95,81 @@ const searchMasterRegister = (req, res) => {
   });
 };
 
+/* Additional Billing Create */
+const createAdditionalBilling = (req, res) => {
+  const { items, ...headerData } = req.body;
+
+  billingModel.createBilling(
+    headerData,
+    items,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to save billing",
+          error: err
+        });
+      }
+
+      res.status(201).json(result);
+    }
+  );
+};
+
+/* Additional Billing Get All */
+const getAdditionalBilling = (req, res) => {
+  billingModel.getAllBilling((err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Failed to fetch billing"
+      });
+    }
+
+    res.json(result);
+  });
+};
+
+/* Additional Billing Delete */
+const deleteAdditionalBilling = (req, res) => {
+  const { id } = req.params;
+
+  billingModel.deleteBilling(id, (err) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Delete failed"
+      });
+    }
+
+    res.json({
+      message: "Deleted successfully"
+    });
+  });
+};
+
+const getAdditionalBillingItems = (req, res) => {
+  billingModel.getBillingItems(
+    req.params.id,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to fetch items"
+        });
+      }
+
+      res.json(result);
+    }
+  );
+};
+
 module.exports = {
   createMasterRegister,
   getMasterRegisters,
   getMasterRegisterById,
   updateMasterRegister,
   deleteMasterRegister,
-  searchMasterRegister
+  searchMasterRegister,
+
+  createAdditionalBilling,
+  getAdditionalBilling,
+  deleteAdditionalBilling,
+  getAdditionalBillingItems
 };

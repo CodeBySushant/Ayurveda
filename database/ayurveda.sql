@@ -68,3 +68,53 @@ CREATE TABLE master_register (
 );
 SELECT * FROM master_register;
 
+CREATE TABLE additional_service_billing (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+
+    bill_number VARCHAR(30) UNIQUE NOT NULL,
+
+    master_number VARCHAR(50) NOT NULL,
+
+    patient_name VARCHAR(100) NOT NULL,
+    patient_surname VARCHAR(100),
+    full_name VARCHAR(200),
+
+    caste VARCHAR(50),
+    gender VARCHAR(20),
+    age VARCHAR(20),
+    contact_number VARCHAR(20),
+
+    discount_type VARCHAR(50),
+    discount_percent DECIMAL(10,2) DEFAULT 0,
+    discount_amount DECIMAL(10,2) DEFAULT 0,
+
+    payment_mode VARCHAR(30) DEFAULT 'cash',
+    reference_number VARCHAR(100),
+
+    subtotal DECIMAL(12,2) DEFAULT 0,
+    total_amount DECIMAL(12,2) DEFAULT 0,
+
+    remarks TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE additional_service_billing_items (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+
+    billing_id INT NOT NULL,
+
+    service_type VARCHAR(100) NOT NULL,
+    service_name VARCHAR(150) NOT NULL,
+
+    quantity INT DEFAULT 1,
+
+    rate DECIMAL(12,2) DEFAULT 0,
+    amount DECIMAL(12,2) DEFAULT 0,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (billing_id)
+    REFERENCES additional_service_billing(id)
+    ON DELETE CASCADE
+);

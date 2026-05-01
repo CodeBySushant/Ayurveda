@@ -7,7 +7,12 @@ const {
   getMasterRegisterById,
   updateMasterRegister,
   deleteMasterRegister,
-  searchMasterRegister
+  searchMasterRegister,
+
+  createAdditionalBilling,
+  getAdditionalBilling,
+  deleteAdditionalBilling,
+  getAdditionalBillingItems
 } = require("../controllers/commonController");
 
 /* Master Register Routes */
@@ -23,5 +28,27 @@ router.get("/master-register/:id", getMasterRegisterById);
 router.put("/master-register/:id", updateMasterRegister);
 
 router.delete("/master-register/:id", deleteMasterRegister);
+
+/* Additional Billing Routes */
+
+router.post(
+  "/additional-billing",
+  createAdditionalBilling
+);
+
+router.get(
+  "/additional-billing",
+  getAdditionalBilling
+);
+
+router.delete(
+  "/additional-billing/:id",
+  deleteAdditionalBilling
+);
+
+router.get(
+  "/additional-billing/:id/items",
+  getAdditionalBillingItems
+);
 
 module.exports = router;
