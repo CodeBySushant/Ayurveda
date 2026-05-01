@@ -1,5 +1,6 @@
 const masterRegisterModel = require("../models/masterRegisterModel");
 const billingModel = require("../models/billingModel");
+const referralSlipModel = require("../models/referralSlipModel");
 
 /* Create */
 const createMasterRegister = (req, res) => {
@@ -160,6 +161,80 @@ const getAdditionalBillingItems = (req, res) => {
   );
 };
 
+/* Referral Slip Create */
+const createReferralSlip = (req, res) => {
+  const {
+    services,
+    medicines,
+    ...headerData
+  } = req.body;
+
+  referralSlipModel.createReferralSlip(
+    headerData,
+    services,
+    medicines,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to save referral slip",
+          error: err
+        });
+      }
+
+      res.status(201).json(result);
+    }
+  );
+};
+
+/* Referral Slip Get All */
+const getReferralSlips = (req, res) => {
+  referralSlipModel.getAllReferralSlips(
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to fetch referral slips"
+        });
+      }
+
+      res.json(result);
+    }
+  );
+};
+
+/* Referral Slip Delete */
+const deleteReferralSlip = (req, res) => {
+  referralSlipModel.deleteReferralSlip(
+    req.params.id,
+    (err) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Delete failed"
+        });
+      }
+
+      res.json({
+        message: "Deleted successfully"
+      });
+    }
+  );
+};
+
+/* Referral Slip Items */
+const getReferralSlipItems = (req, res) => {
+  referralSlipModel.getReferralItems(
+    req.params.id,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to fetch details"
+        });
+      }
+
+      res.json(result[0]);
+    }
+  );
+};
+
 module.exports = {
   createMasterRegister,
   getMasterRegisters,
@@ -171,5 +246,10 @@ module.exports = {
   createAdditionalBilling,
   getAdditionalBilling,
   deleteAdditionalBilling,
-  getAdditionalBillingItems
+  getAdditionalBillingItems,
+
+  createReferralSlip,
+  getReferralSlips,
+  deleteReferralSlip,
+  getReferralSlipItems
 };

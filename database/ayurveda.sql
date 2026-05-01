@@ -118,3 +118,72 @@ CREATE TABLE additional_service_billing_items (
     REFERENCES additional_service_billing(id)
     ON DELETE CASCADE
 );
+
+CREATE TABLE referral_slips (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  slip_number VARCHAR(30) UNIQUE,
+  form_date VARCHAR(20),
+
+  /* Source Institution */
+  from_institution_name VARCHAR(150),
+  from_address VARCHAR(200),
+  from_contact VARCHAR(30),
+  from_province VARCHAR(50),
+
+  /* Patient */
+  master_number VARCHAR(50),
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  gender VARCHAR(20),
+  age VARCHAR(20),
+  district VARCHAR(100),
+  ward_number VARCHAR(20),
+
+  /* Vitals */
+  blood_pressure VARCHAR(30),
+  pulse VARCHAR(30),
+  temperature VARCHAR(30),
+  respiration VARCHAR(30),
+  weight VARCHAR(30),
+  height VARCHAR(30),
+  height_unit VARCHAR(10),
+  body_type VARCHAR(100),
+  ayurveda_therapy VARCHAR(150),
+
+  other_notes TEXT,
+
+  /* Referred To */
+  to_institution_name VARCHAR(150),
+  to_address VARCHAR(200),
+  contact_date VARCHAR(30),
+  required_tests TEXT,
+  referral_reason TEXT,
+
+  /* Official */
+  official_name VARCHAR(120),
+  official_designation VARCHAR(120),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE referral_services (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  referral_id INT NOT NULL,
+  service_name VARCHAR(200),
+
+  FOREIGN KEY (referral_id)
+  REFERENCES referral_slips(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE referral_medicines (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  referral_id INT NOT NULL,
+  medicine_name VARCHAR(200),
+  dosage VARCHAR(100),
+
+  FOREIGN KEY (referral_id)
+  REFERENCES referral_slips(id)
+  ON DELETE CASCADE
+);

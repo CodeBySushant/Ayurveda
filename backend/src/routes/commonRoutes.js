@@ -12,7 +12,12 @@ const {
   createAdditionalBilling,
   getAdditionalBilling,
   deleteAdditionalBilling,
-  getAdditionalBillingItems
+  getAdditionalBillingItems,
+
+  createReferralSlip,
+  getReferralSlips,
+  deleteReferralSlip,
+  getReferralSlipItems
 } = require("../controllers/commonController");
 
 /* Master Register Routes */
@@ -49,6 +54,28 @@ router.delete(
 router.get(
   "/additional-billing/:id/items",
   getAdditionalBillingItems
+);
+
+/* Referral Slip Routes */
+
+router.post(
+  "/referral-slip",
+  createReferralSlip
+);
+
+router.get(
+  "/referral-slip",
+  getReferralSlips
+);
+
+router.delete(
+  "/referral-slip/:id",
+  deleteReferralSlip
+);
+
+router.get(
+  "/referral-slip/:id/items",
+  getReferralSlipItems
 );
 
 module.exports = router;
