@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -7,6 +7,7 @@ import {
   Navigate,
   Outlet,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 import "./App.css";
@@ -74,6 +75,14 @@ function Layout() {
 
   const location = useLocation();
   const activeLink = location.pathname;
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
 
   const handleToggle = (id) => {
     setOpenMenu(openMenu === id ? null : id);
@@ -227,6 +236,10 @@ function Layout() {
             />
           ))}
         </nav>
+
+        <button className="logout-btn" onClick={handleLogout}>
+          {sidebarOpen ? "लग आउट गर्नुहोस्" : "⎋"}
+        </button>
       </aside>
 
       {/* Main */}
@@ -246,11 +259,16 @@ function ProtectedRoute({ children }) {
 
 /* ---------------- App ---------------- */
 export default function App() {
+  const token = localStorage.getItem("token");
+
   return (
     <BrowserRouter>
       <Routes>
         {/* Login Disabled for Now */}
-        <Route path="/" element={<Login />} />
+        <Route
+          path="/"
+          element={token ? <Navigate to="/dashboard" replace /> : <Login />}
+        />
 
         {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
 
