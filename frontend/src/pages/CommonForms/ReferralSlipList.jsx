@@ -298,9 +298,6 @@ export default function PreshonDainikSuchi() {
             <thead>
               {/* Row 1 */}
               <tr>
-                <th rowSpan={3} style={s.th}>
-                  कार्य
-                </th>
                 <th colSpan={3} style={s.thGroup}>
                   संस्थाको ठेगाना
                 </th>
@@ -345,6 +342,9 @@ export default function PreshonDainikSuchi() {
                 </th>
                 <th rowSpan={3} style={s.th}>
                   Pub
+                </th>
+                <th rowSpan={3} style={s.th}>
+                  कार्य
                 </th>
               </tr>
               {/* Row 2 */}
@@ -393,32 +393,6 @@ export default function PreshonDainikSuchi() {
               ) : (
                 pageData.map((row, i) => (
                   <tr key={row.id || i}>
-                    <td style={s.td(i % 2 !== 0)}>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "6px",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <button type="button" onClick={() => handlePrint(row)}>
-                          Print
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(row.id)}
-                        >
-                          Delete
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleView(row.id)}
-                        >
-                          View
-                        </button>
-                      </div>
-                    </td>
-
                     <td style={s.td(i % 2 !== 0)}>{row.from_province}</td>
                     <td style={s.td(i % 2 !== 0)}>-</td>
                     <td style={s.td(i % 2 !== 0)}>{row.from_address}</td>
@@ -443,6 +417,64 @@ export default function PreshonDainikSuchi() {
                     <td style={s.td(i % 2 !== 0)}>{row.temperature}</td>
                     <td style={s.td(i % 2 !== 0)}>{row.weight}</td>
                     <td style={s.td(i % 2 !== 0)}>{row.body_type}</td>
+                    <td style={s.td(i % 2 !== 0)}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "6px",
+                          justifyContent: "center",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handlePrint(row)}
+                          style={{
+                            padding: "4px 10px",
+                            border: "none",
+                            background: "#2563eb",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Print
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(row.id)}
+                          style={{
+                            padding: "4px 10px",
+                            border: "none",
+                            background: "#dc2626",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleView(row.id)}
+                          style={{
+                            padding: "4px 10px",
+                            border: "none",
+                            background: "#16a34a",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          View
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
