@@ -1,5 +1,6 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
+import { LogOut } from "lucide-react";
 import {
   BrowserRouter,
   Routes,
@@ -238,7 +239,8 @@ function Layout() {
         </nav>
 
         <button className="logout-btn" onClick={handleLogout}>
-          {sidebarOpen ? "लग आउट गर्नुहोस्" : "⎋"}
+          <LogOut size={18} />
+          {sidebarOpen && <span>लग आउट गर्नुहोस्</span>}
         </button>
       </aside>
 
