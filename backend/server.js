@@ -2,7 +2,9 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const db = require("./src/config/db");
+require("./src/config/db");
+
+const authRoutes = require("./src/routes/authRoutes");
 
 const app = express();
 
@@ -12,6 +14,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Ayurveda Backend Running ✅");
 });
+
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
