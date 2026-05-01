@@ -1,170 +1,279 @@
 import { useState } from "react";
-
-const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Yatra+One&display=swap');
-
-  .ayur-root {
-    font-family: 'Tiro Devanagari Hindi', serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-
-  @keyframes ayur-cardIn {
-    from { opacity: 0; transform: translateY(32px) scale(0.97); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  .ayur-card {
-    position: relative; z-index: 10;
-    background: rgba(248, 244, 232, 0.92);
-    backdrop-filter: blur(12px);
-    border-radius: 22px;
-    padding: 42px 44px 48px;
-    width: 380px;
-    box-shadow: 0 20px 60px rgba(30,80,30,0.25), 0 2px 8px rgba(255,255,255,0.5) inset;
-    border: 1.5px solid rgba(255,255,255,0.7);
-    animation: ayur-cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  .ayur-title {
-    font-family: 'Yatra One', cursive;
-    color: #2bb5c8;
-    font-size: 1.45rem;
-    text-align: center;
-    margin-bottom: 32px;
-    line-height: 1.5;
-    letter-spacing: 0.01em;
-    text-shadow: 0 1px 3px rgba(0,100,120,0.12);
-  }
-
-  .ayur-input-group {
-    margin-bottom: 18px;
-    position: relative;
-  }
-
-  .ayur-input-icon {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    color: #4a9e4a; font-size: 1.05rem; pointer-events: none; z-index: 1;
-  }
-
-  .ayur-input {
-    width: 100%;
-    padding: 13px 16px 13px 44px;
-    border: 1.5px solid rgba(180,210,170,0.8);
-    border-radius: 10px;
-    background: rgba(255,255,255,0.88);
-    font-family: 'Tiro Devanagari Hindi', serif;
-    font-size: 1rem;
-    color: #1a3a1a;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    box-sizing: border-box;
-  }
-  .ayur-input::placeholder { color: #8aaa80; font-size: 0.95rem; }
-  .ayur-input:focus {
-    border-color: #2bb5c8;
-    background: rgba(255,255,255,0.97);
-    box-shadow: 0 0 0 3px rgba(43,181,200,0.15);
-  }
-
-  .ayur-btn {
-    width: 100%;
-    margin-top: 10px;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Yatra One', cursive;
-    font-size: 1.08rem;
-    color: #fff;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    position: relative; overflow: hidden;
-    transition: transform 0.15s, box-shadow 0.15s, background 0.2s, opacity 0.2s;
-  }
-  .ayur-btn-normal {
-    background: linear-gradient(135deg, #2bb5c8 0%, #1e9ab0 60%, #178898 100%);
-    box-shadow: 0 4px 18px rgba(30,154,176,0.38);
-  }
-  .ayur-btn-normal:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(30,154,176,0.5);
-    background: linear-gradient(135deg, #35c5d8 0%, #25aac0 60%, #1a98a8 100%);
-  }
-  .ayur-btn-normal:active { transform: translateY(0); }
-  .ayur-btn-error { background: linear-gradient(135deg,#e05050,#c03030); box-shadow: 0 4px 18px rgba(200,50,50,0.35); }
-  .ayur-btn-success { background: linear-gradient(135deg,#3ac860,#28a048); box-shadow: 0 4px 18px rgba(40,160,72,0.35); }
-  .ayur-btn-loading { background: linear-gradient(135deg, #2bb5c8, #1e9ab0); opacity: 0.8; }
-
-  .ayur-divider {
-    display: flex; align-items: center; gap: 10px;
-    margin: 20px 0 14px;
-    color: #4a9e4a; font-size: 0.78rem; opacity: 0.7;
-  }
-  .ayur-divider::before, .ayur-divider::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, transparent, #a8d5a2, transparent);
-  }
-
-  .ayur-herb-row {
-    display: flex; justify-content: center; gap: 12px;
-    margin-top: 8px; opacity: 0.5; font-size: 1.4rem;
-  }
-`;
+import { useNavigate } from "react-router-dom";
 
 export default function AyurvedaLogin() {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [btnState, setBtnState] = useState("normal"); // normal | loading | error | success
+
+  const [btnState, setBtnState] = useState("normal");
   const [btnText, setBtnText] = useState("लग-इन गर्नुहोस्");
 
-  const handleLogin = () => {
-    if (!username.trim() || !password.trim()) {
-      setBtnState("error");
-      setBtnText("कृपया विवरण भर्नुहोस्!");
-      setTimeout(() => {
-        setBtnState("normal");
-        setBtnText("लग-इन गर्नुहोस्");
-      }, 1800);
-      return;
+  const styles = `
+    @import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:wght@400;700&family=Yatra+One&display=swap');
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
     }
-    setBtnState("loading");
-    setBtnText("प्रवेश गर्दै...");
+
+    body{
+      font-family:'Tiro Devanagari Hindi', serif;
+    }
+
+    .login-page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      position:relative;
+      overflow:hidden;
+
+      background-image:
+        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+        url('/ayurveda1.webp');
+
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    .login-page::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      backdrop-filter: blur(6px);
+    }
+
+    .login-card{
+      position:relative;
+      z-index:2;
+      width:100%;
+      max-width:420px;
+      padding:40px 34px;
+      border-radius:24px;
+      background:rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.25);
+      box-shadow:0 20px 60px rgba(0,0,0,0.25);
+      backdrop-filter: blur(16px);
+      animation:fadeUp .6s ease;
+    }
+
+    @keyframes fadeUp{
+      from{
+        opacity:0;
+        transform:translateY(30px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    .logo{
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      margin:0 auto 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:32px;
+      background:rgba(255,255,255,0.18);
+      border:1px solid rgba(255,255,255,0.2);
+    }
+
+    .title{
+      font-family:'Yatra One', cursive;
+      color:#ffffff;
+      font-size:28px;
+      text-align:center;
+      margin-bottom:8px;
+      line-height:1.4;
+    }
+
+    .subtitle{
+      text-align:center;
+      color:rgba(255,255,255,0.82);
+      font-size:14px;
+      margin-bottom:28px;
+    }
+
+    .field{
+      margin-bottom:18px;
+      position:relative;
+    }
+
+    .field input{
+      width:100%;
+      height:54px;
+      border:none;
+      outline:none;
+      border-radius:14px;
+      padding:0 18px 0 48px;
+      font-size:15px;
+      color:#1f2937;
+      background:rgba(255,255,255,0.95);
+      box-shadow:0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    .field input:focus{
+      box-shadow:0 0 0 3px rgba(34,197,94,0.25);
+    }
+
+    .icon{
+      position:absolute;
+      top:50%;
+      left:16px;
+      transform:translateY(-50%);
+      font-size:18px;
+    }
+
+    .login-btn{
+      width:100%;
+      height:54px;
+      border:none;
+      outline:none;
+      border-radius:14px;
+      margin-top:6px;
+      cursor:pointer;
+      font-size:17px;
+      font-family:'Yatra One', cursive;
+      color:#fff;
+      transition:.25s ease;
+      background:linear-gradient(135deg,#16a34a,#22c55e);
+      box-shadow:0 12px 25px rgba(34,197,94,0.35);
+    }
+
+    .login-btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .login-btn.loading{
+      background:linear-gradient(135deg,#0ea5e9,#0284c7);
+    }
+
+    .login-btn.error{
+      background:linear-gradient(135deg,#ef4444,#dc2626);
+    }
+
+    .login-btn.success{
+      background:linear-gradient(135deg,#16a34a,#15803d);
+    }
+
+    .footer{
+      text-align:center;
+      margin-top:18px;
+      color:rgba(255,255,255,0.7);
+      font-size:13px;
+    }
+
+    .plants{
+      margin-top:14px;
+      text-align:center;
+      font-size:20px;
+      letter-spacing:8px;
+    }
+
+    @media(max-width:500px){
+      .login-card{
+        padding:30px 22px;
+      }
+
+      .title{
+        font-size:23px;
+      }
+    }
+  `;
+
+  const resetBtn = () => {
     setTimeout(() => {
-      setBtnState("success");
-      setBtnText("✓ स्वागत छ!");
-    }, 1000);
+      setBtnState("normal");
+      setBtnText("लग-इन गर्नुहोस्");
+    }, 1600);
   };
 
-  const btnClass = `ayur-btn ayur-btn-${btnState}`;
+  const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
+      setBtnState("error");
+      setBtnText("सबै विवरण भर्नुहोस्");
+      resetBtn();
+      return;
+    }
+
+    try {
+      setBtnState("loading");
+      setBtnText("प्रवेश हुँदैछ...");
+
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setBtnState("error");
+        setBtnText(data.message || "लग-इन असफल");
+        resetBtn();
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      setBtnState("success");
+      setBtnText("✓ स्वागत छ");
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 900);
+
+    } catch (error) {
+      setBtnState("error");
+      setBtnText("Server Error");
+      resetBtn();
+    }
+  };
 
   return (
     <>
       <style>{styles}</style>
-      <div className="ayur-root">
-        <div className="ayur-card">
-          <div className="ayur-title">
-            आयुर्वेद रिपोर्टिङ् प्रणालीमा स्वागत छ
-          </div>
 
-          <div className="ayur-input-group">
-            <span className="ayur-input-icon">👤</span>
+      <div className="login-page">
+        <div className="login-card">
+          <div className="logo">🌿</div>
+
+          <h1 className="title">
+            आयुर्वेद रिपोर्टिङ् प्रणाली
+          </h1>
+
+          <p className="subtitle">
+            सुरक्षित रूपमा प्रणालीमा प्रवेश गर्नुहोस्
+          </p>
+
+          <div className="field">
+            <span className="icon">👤</span>
             <input
-              className="ayur-input"
               type="text"
               placeholder="प्रयोगकर्ता नाम"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              autoComplete="off"
             />
           </div>
 
-          <div className="ayur-input-group">
-            <span className="ayur-input-icon">🔒</span>
+          <div className="field">
+            <span className="icon">🔒</span>
             <input
-              className="ayur-input"
               type="password"
               placeholder="पासवर्ड"
               value={password}
@@ -173,13 +282,20 @@ export default function AyurvedaLogin() {
             />
           </div>
 
-          <button className={btnClass} onClick={handleLogin}>
+          <button
+            className={`login-btn ${btnState}`}
+            onClick={handleLogin}
+          >
             {btnText}
           </button>
 
-          <div className="ayur-divider">🌿</div>
+          <div className="plants">
+            🌱 🌿 🍃 🌾
+          </div>
 
-          <div className="ayur-herb-row">🌱 🍃 🌿 🌾 🌱</div>
+          <div className="footer">
+            © Ayurveda Management System
+          </div>
         </div>
       </div>
     </>
