@@ -250,7 +250,11 @@ export default function MasterRegisterDailyList() {
     row.is_free ? "नि:शुल्क" : `रू ${row.fee_amount || 0}`;
 
   const handlePrint = (row) => {
-    const printWindow = window.open("", "_blank", "width=900,height=700");
+    const printWindow = window.open(
+      "",
+      "_blank",
+      "width=900,height=700,left=100,top=50",
+    );
 
     if (!printWindow) {
       alert("Please allow popups for printing.");
@@ -414,10 +418,15 @@ export default function MasterRegisterDailyList() {
       </div>
 
       <script>
-        window.onload = function(){
+        window.onload = function () {
+          setTimeout(() => {
           window.print();
-          window.onafterprint = () => window.close();
-        }
+
+        setTimeout(() => {
+        window.close();
+          }, 300);
+        }, 200);
+    };
       </script>
     </body>
   </html>
