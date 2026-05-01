@@ -215,13 +215,9 @@ export default function MasterRegisterDailyList() {
       const fullName =
         `${row.first_name || ""} ${row.last_name || ""}`.toLowerCase();
 
-      const byNo = row.master_number
-        ?.toString()
-        .includes(searchNo.trim());
+      const byNo = row.master_number?.toString().includes(searchNo.trim());
 
-      const byName = fullName.includes(
-        searchName.trim().toLowerCase()
-      );
+      const byName = fullName.includes(searchName.trim().toLowerCase());
 
       const byDate = searchDate
         ? row.entry_date?.slice(0, 10) === searchDate
@@ -233,10 +229,7 @@ export default function MasterRegisterDailyList() {
 
   /* Pagination */
   const pageSize = parseInt(entries);
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filtered.length / pageSize)
-  );
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
 
   const pageData = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -256,6 +249,184 @@ export default function MasterRegisterDailyList() {
   const feeText = (row) =>
     row.is_free ? "नि:शुल्क" : `रू ${row.fee_amount || 0}`;
 
+  const handlePrint = (row) => {
+    const printWindow = window.open("", "_blank", "width=900,height=700");
+
+    if (!printWindow) {
+      alert("Please allow popups for printing.");
+      return;
+    }
+
+    const html = `
+  <html>
+    <head>
+      <title>Print Slip</title>
+      <style>
+        body{
+          font-family: Arial, sans-serif;
+          padding:40px;
+          color:#111;
+        }
+
+        .header{
+          text-align:center;
+          margin-bottom:30px;
+        }
+
+        .header h1{
+          margin:0;
+          font-size:26px;
+        }
+
+        .header p{
+          margin:6px 0;
+          color:#555;
+        }
+
+        .title{
+          text-align:center;
+          font-size:20px;
+          font-weight:bold;
+          margin-bottom:25px;
+          border-bottom:2px solid #000;
+          padding-bottom:8px;
+        }
+
+        .grid{
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:14px;
+        }
+
+        .field{
+          padding:10px;
+          border:1px solid #ddd;
+          border-radius:6px;
+        }
+
+        .label{
+          font-size:12px;
+          color:#666;
+          margin-bottom:4px;
+        }
+
+        .value{
+          font-size:16px;
+          font-weight:600;
+        }
+
+        .full{
+          grid-column:1 / -1;
+        }
+
+        .footer{
+          margin-top:50px;
+          display:flex;
+          justify-content:space-between;
+        }
+
+        .sign{
+          margin-top:50px;
+          width:220px;
+          text-align:center;
+          border-top:1px solid #000;
+          padding-top:8px;
+        }
+
+        @media print{
+          button{display:none;}
+        }
+      </style>
+    </head>
+
+    <body>
+      <div class="header">
+        <h1>Ayurveda Service Center</h1>
+        <p>Master Register Print Slip</p>
+      </div>
+
+      <div class="title">Patient Registration Slip</div>
+
+      <div class="grid">
+
+        <div class="field">
+          <div class="label">Master Number</div>
+          <div class="value">${row.master_number || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Date</div>
+          <div class="value">${row.entry_date ? new Date(row.entry_date).toLocaleDateString("en-GB") : ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Full Name</div>
+          <div class="value">${row.first_name || ""} ${row.last_name || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Gender</div>
+          <div class="value">${row.gender || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Age</div>
+          <div class="value">${row.age || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Contact</div>
+          <div class="value">${row.contact_number || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Province</div>
+          <div class="value">${row.province || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Ward</div>
+          <div class="value">${row.ward_number || ""}</div>
+        </div>
+
+        <div class="field full">
+          <div class="label">Locality</div>
+          <div class="value">${row.locality || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Visit Type</div>
+          <div class="value">${row.visit_type || ""}</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Fee</div>
+          <div class="value">
+            ${row.is_free ? "Free" : "Rs. " + (row.fee_amount || 0)}
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer">
+        <div class="sign">Authorized Signature</div>
+        <div class="sign">Patient Signature</div>
+      </div>
+
+      <script>
+        window.onload = function(){
+          window.print();
+          window.onafterprint = () => window.close();
+        }
+      </script>
+    </body>
+  </html>
+  `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
   /* UI */
 
   return (
@@ -263,9 +434,7 @@ export default function MasterRegisterDailyList() {
       {/* Header */}
       <div style={s.nav}>
         <div style={s.title}>मूल दर्ता दैनिक सूची</div>
-        <div style={s.breadcrumb}>
-          गृहपृष्ठ / मूल दर्ता दैनिक सूची
-        </div>
+        <div style={s.breadcrumb}>गृहपृष्ठ / मूल दर्ता दैनिक सूची</div>
       </div>
 
       {/* Toolbar */}
@@ -345,53 +514,31 @@ export default function MasterRegisterDailyList() {
                 ) : (
                   pageData.map((row, i) => (
                     <tr key={row.id}>
-                      <td style={s.td(i % 2)}>
-                        {row.id}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.id}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {formatDate(row.entry_date)}
-                      </td>
+                      <td style={s.td(i % 2)}>{formatDate(row.entry_date)}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.master_number}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.master_number}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.visit_type}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.visit_type}</td>
 
                       <td style={s.td(i % 2)}>
                         {row.first_name} {row.last_name}
                       </td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.gender}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.gender}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.age}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.age}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.contact_number}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.contact_number}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.province}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.province}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.ward_number}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.ward_number}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {row.locality}
-                      </td>
+                      <td style={s.td(i % 2)}>{row.locality}</td>
 
-                      <td style={s.td(i % 2)}>
-                        {feeText(row)}
-                      </td>
+                      <td style={s.td(i % 2)}>{feeText(row)}</td>
 
                       <td style={s.td(i % 2)}>
                         <div
@@ -403,18 +550,14 @@ export default function MasterRegisterDailyList() {
                         >
                           <button
                             style={s.btnBlue}
-                            onClick={() =>
-                              window.print()
-                            }
+                            onClick={() => handlePrint(row)}
                           >
                             Print
                           </button>
 
                           <button
                             style={s.btnRed}
-                            onClick={() =>
-                              handleDelete(row.id)
-                            }
+                            onClick={() => handleDelete(row.id)}
                           >
                             Delete
                           </button>
@@ -429,9 +572,7 @@ export default function MasterRegisterDailyList() {
 
           {/* Footer */}
           <div style={s.footer}>
-            <div>
-              Total Records: {filtered.length}
-            </div>
+            <div>Total Records: {filtered.length}</div>
 
             <div
               style={{
@@ -443,9 +584,7 @@ export default function MasterRegisterDailyList() {
               <button
                 style={s.pageBtn}
                 disabled={page <= 1}
-                onClick={() =>
-                  setPage((p) => p - 1)
-                }
+                onClick={() => setPage((p) => p - 1)}
               >
                 Previous
               </button>
@@ -457,9 +596,7 @@ export default function MasterRegisterDailyList() {
               <button
                 style={s.pageBtn}
                 disabled={page >= totalPages}
-                onClick={() =>
-                  setPage((p) => p + 1)
-                }
+                onClick={() => setPage((p) => p + 1)}
               >
                 Next
               </button>
