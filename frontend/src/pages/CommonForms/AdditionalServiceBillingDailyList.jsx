@@ -185,7 +185,10 @@ export default function ThapSevaBilingDainikSuchi() {
         `http://localhost:5000/api/common/additional-billing/${id}`,
       );
 
-      fetchBilling();
+      await fetchBilling();
+      setPage(1);
+
+      alert("Deleted successfully");
     } catch (error) {
       alert("Delete failed");
     }
@@ -419,10 +422,52 @@ export default function ThapSevaBilingDainikSuchi() {
                           justifyContent: "center",
                         }}
                       >
-                        <button type="button" onClick={() => handlePrint(row)}>🖨</button>
-                        <button type="button" onClick={() => handleDelete(row.id)}>🗑</button>
-                        <button type="button" onClick={() => handleViewItems(row.id)}>
-                          👁
+                        <button
+                          type="button"
+                          onClick={() => handlePrint(row)}
+                          style={{
+                            padding: "4px 10px",
+                            border: "none",
+                            background: "#2563eb",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Print
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(row.id)}
+                          style={{
+                            padding: "4px 10px",
+                            border: "none",
+                            background: "#dc2626",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleViewItems(row.id)}
+                          style={{
+                            padding: "4px 10px",
+                            border: "none",
+                            background: "#16a34a",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          View
                         </button>
                       </div>
                     </td>
