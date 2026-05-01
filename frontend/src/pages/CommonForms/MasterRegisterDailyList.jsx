@@ -1,272 +1,469 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 
-const SAMPLE_DATA = [];
+const API = "http://localhost:5000/api/common/master-register";
+
+/* ───────────────────────── Styles ───────────────────────── */
 
 const s = {
   root: {
-    fontFamily: "'Noto Sans Devanagari', 'Noto Sans', 'Segoe UI', sans-serif",
+    fontFamily: "'Noto Sans Devanagari','Segoe UI',sans-serif",
     background: "#f0f2f5",
     minHeight: "100vh",
-    fontSize: 13,
     color: "#333",
+    fontSize: 13,
   },
+
   nav: {
-    background: "#e8eaf0",
-    borderBottom: "1px solid #d0d3db",
-    padding: "10px 20px",
+    padding: "14px 22px",
+    background: "#ffffff",
+    borderBottom: "1px solid #e5e7eb",
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
-  },
-  navTitle: { fontWeight: 700, fontSize: 17, color: "#222" },
-  navBreadcrumb: { fontSize: 13, color: "#555" },
-  navLink: { color: "#1565c0", textDecoration: "none", fontWeight: 500 },
-  filterBar: {
-    padding: "10px 20px",
-    display: "flex",
     alignItems: "center",
-    gap: 8,
-    background: "#f0f2f5",
     flexWrap: "wrap",
+    gap: 10,
   },
-  showLabel: { fontSize: 13, color: "#444", display: "flex", alignItems: "center", gap: 6 },
-  select: {
-    border: "1px solid #ccc",
-    borderRadius: 3,
-    padding: "3px 6px",
+
+  title: {
+    fontSize: 20,
+    fontWeight: 700,
+    color: "#111827",
+  },
+
+  breadcrumb: {
+    color: "#6b7280",
     fontSize: 13,
-    height: 30,
-    background: "white",
-    cursor: "pointer",
   },
-  spacer: { flex: 1 },
-  input: {
-    border: "1px solid #ccc",
-    borderRadius: 3,
-    padding: "4px 10px",
-    fontSize: 13,
-    height: 32,
-    background: "white",
-    outline: "none",
-    minWidth: 150,
-  },
-  dateInput: {
-    border: "1px solid #ccc",
-    borderRadius: 3,
-    padding: "4px 10px",
-    fontSize: 13,
-    height: 32,
-    background: "white",
-    outline: "none",
-    width: 120,
-  },
-  searchBtn: {
-    background: "#1e88e5",
-    color: "white",
-    border: "none",
-    borderRadius: 3,
-    padding: "4px 14px",
-    height: 32,
-    fontSize: 15,
-    cursor: "pointer",
+
+  toolbar: {
+    padding: "14px 22px",
     display: "flex",
+    gap: 10,
+    flexWrap: "wrap",
     alignItems: "center",
   },
-  pageBody: { padding: "0 20px 24px" },
-  tableWrapper: {
-    background: "white",
-    border: "1px solid #dde",
-    borderRadius: 3,
-    overflow: "auto",
+
+  select: {
+    height: 36,
+    border: "1px solid #d1d5db",
+    borderRadius: 6,
+    padding: "0 10px",
+    background: "#fff",
   },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 12, minWidth: 1100 },
-  th: {
-    background: "#eef1f8",
-    fontWeight: 600,
-    padding: "7px 8px",
-    border: "1px solid #d5daea",
-    textAlign: "center",
-    color: "#3a4570",
-    verticalAlign: "middle",
-    whiteSpace: "nowrap",
-    lineHeight: 1.4,
+
+  input: {
+    height: 36,
+    border: "1px solid #d1d5db",
+    borderRadius: 6,
+    padding: "0 12px",
+    background: "#fff",
+    minWidth: 170,
+    outline: "none",
   },
-  thGroup: {
-    background: "#e4e8f5",
-    fontWeight: 700,
-    padding: "7px 8px",
-    border: "1px solid #d5daea",
-    textAlign: "center",
-    color: "#3a4570",
-    verticalAlign: "middle",
-  },
-  td: (alt) => ({
-    border: "1px solid #eee",
-    padding: "7px 8px",
-    textAlign: "center",
-    background: alt ? "#f7f8fc" : "white",
-    color: "#444",
-    fontSize: 12,
-    verticalAlign: "middle",
-  }),
-  noDataTd: {
-    border: "1px solid #eee",
-    padding: "18px",
-    textAlign: "center",
-    color: "#aaa",
-    fontSize: 13,
-    background: "#fafafa",
-  },
-  paginationRow: {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 4,
-    padding: "10px 12px",
-    borderTop: "3px solid #8899cc",
-  },
-  pageBtn: {
-    border: "1px solid #ccc",
-    background: "white",
-    borderRadius: 3,
-    padding: "4px 14px",
-    fontSize: 13,
+
+  btn: {
+    height: 36,
+    border: "none",
+    borderRadius: 6,
+    padding: "0 14px",
     cursor: "pointer",
-    color: "#333",
+    background: "#0d9488",
+    color: "#fff",
+    fontWeight: 600,
+  },
+
+  btnBlue: {
+    height: 32,
+    border: "none",
+    borderRadius: 6,
+    padding: "0 10px",
+    cursor: "pointer",
+    background: "#2563eb",
+    color: "#fff",
+    fontSize: 12,
+  },
+
+  btnRed: {
+    height: 32,
+    border: "none",
+    borderRadius: 6,
+    padding: "0 10px",
+    cursor: "pointer",
+    background: "#dc2626",
+    color: "#fff",
+    fontSize: 12,
+  },
+
+  body: {
+    padding: "0 22px 24px",
+  },
+
+  card: {
+    background: "#fff",
+    borderRadius: 8,
+    overflow: "hidden",
+    border: "1px solid #e5e7eb",
+  },
+
+  tableWrap: {
+    overflowX: "auto",
+  },
+
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    minWidth: 1100,
+  },
+
+  th: {
+    background: "#eef2ff",
+    padding: "10px 8px",
+    borderBottom: "1px solid #dbeafe",
+    fontWeight: 700,
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    color: "#1e3a8a",
+    fontSize: 12,
+  },
+
+  td: (alt) => ({
+    padding: "10px 8px",
+    borderBottom: "1px solid #f1f5f9",
+    textAlign: "center",
+    background: alt ? "#fafafa" : "#fff",
+    fontSize: 12,
+    whiteSpace: "nowrap",
+  }),
+
+  noData: {
+    padding: 30,
+    textAlign: "center",
+    color: "#9ca3af",
+  },
+
+  footer: {
+    padding: "12px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+
+  pageBtn: {
+    height: 34,
+    border: "1px solid #d1d5db",
+    borderRadius: 6,
+    padding: "0 14px",
+    background: "#fff",
+    cursor: "pointer",
+  },
+
+  loading: {
+    padding: 30,
+    textAlign: "center",
+    color: "#2563eb",
+    fontWeight: 600,
   },
 };
 
-export default function MoolDartaDainikSuchi() {
-  const [entries,    setEntries]    = useState("10");
-  const [moolDarta,  setMoolDarta]  = useState("");
-  const [dateFilter, setDateFilter] = useState("18/01/2083");
-  const [data]                      = useState(SAMPLE_DATA);
-  const [page,       setPage]       = useState(1);
+/* ───────────────────── Component ───────────────────── */
 
-  const pageSize   = parseInt(entries) || 10;
-  const totalPages = Math.max(1, Math.ceil(data.length / pageSize));
-  const pageData   = useMemo(() => {
+export default function MasterRegisterDailyList() {
+  const [data, setData] = useState([]);
+  const [entries, setEntries] = useState("10");
+  const [searchNo, setSearchNo] = useState("");
+  const [searchName, setSearchName] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  /* Fetch Data */
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(API);
+      setData(res.data || []);
+    } catch (error) {
+      console.error("Fetch failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  /* Delete */
+  const handleDelete = async (id) => {
+    const ok = window.confirm("Delete this record?");
+    if (!ok) return;
+
+    try {
+      await axios.delete(`${API}/${id}`);
+      fetchData();
+    } catch (error) {
+      alert("Delete failed");
+    }
+  };
+
+  /* Search Filter */
+  const filtered = useMemo(() => {
+    return data.filter((row) => {
+      const fullName =
+        `${row.first_name || ""} ${row.last_name || ""}`.toLowerCase();
+
+      const byNo = row.master_number
+        ?.toString()
+        .includes(searchNo.trim());
+
+      const byName = fullName.includes(
+        searchName.trim().toLowerCase()
+      );
+
+      const byDate = searchDate
+        ? row.entry_date?.slice(0, 10) === searchDate
+        : true;
+
+      return byNo && byName && byDate;
+    });
+  }, [data, searchNo, searchName, searchDate]);
+
+  /* Pagination */
+  const pageSize = parseInt(entries);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filtered.length / pageSize)
+  );
+
+  const pageData = useMemo(() => {
     const start = (page - 1) * pageSize;
-    return data.slice(start, start + pageSize);
-  }, [data, page, pageSize]);
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [entries, searchNo, searchName, searchDate]);
+
+  /* Helpers */
+  const formatDate = (date) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString("en-GB");
+  };
+
+  const feeText = (row) =>
+    row.is_free ? "नि:शुल्क" : `रू ${row.fee_amount || 0}`;
+
+  /* UI */
 
   return (
     <div style={s.root}>
-      {/* Nav */}
+      {/* Header */}
       <div style={s.nav}>
-        <span style={s.navTitle}>मूल दर्ता दैनिक सूची</span>
-        <span style={s.navBreadcrumb}>
-          <a href="#" style={s.navLink}>गृहपृष्ठ</a>
-          {" / "}मूल दर्ता दैनिक सूची
-        </span>
+        <div style={s.title}>मूल दर्ता दैनिक सूची</div>
+        <div style={s.breadcrumb}>
+          गृहपृष्ठ / मूल दर्ता दैनिक सूची
+        </div>
       </div>
 
-      {/* Filter Bar */}
-      <div style={s.filterBar}>
-        <span style={s.showLabel}>
-          Show
-          <select style={s.select} value={entries} onChange={e => { setEntries(e.target.value); setPage(1); }}>
-            {["10","25","50","100"].map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
-          entries
-        </span>
-        <div style={s.spacer} />
+      {/* Toolbar */}
+      <div style={s.toolbar}>
+        <select
+          style={s.select}
+          value={entries}
+          onChange={(e) => setEntries(e.target.value)}
+        >
+          {["10", "25", "50", "100"].map((n) => (
+            <option key={n}>{n}</option>
+          ))}
+        </select>
+
         <input
           style={s.input}
           placeholder="मूल दर्ता नम्बर"
-          value={moolDarta}
-          onChange={e => setMoolDarta(e.target.value)}
+          value={searchNo}
+          onChange={(e) => setSearchNo(e.target.value)}
         />
+
         <input
-          style={s.dateInput}
-          value={dateFilter}
-          onChange={e => setDateFilter(e.target.value)}
+          style={s.input}
+          placeholder="पुरा नाम"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
         />
-        <button style={s.searchBtn}>🔍</button>
+
+        <input
+          type="date"
+          style={s.input}
+          value={searchDate}
+          onChange={(e) => setSearchDate(e.target.value)}
+        />
+
+        <button style={s.btn} onClick={fetchData}>
+          Refresh
+        </button>
       </div>
 
-      {/* Table */}
-      <div style={s.pageBody}>
-        <div style={s.tableWrapper}>
-          <table style={s.table}>
-            <thead>
-              {/* Row 1 — group headers */}
-              <tr>
-                <th rowSpan={3} style={s.th}>कार्य</th>
-                <th rowSpan={3} style={s.th}>मिति</th>
-                <th rowSpan={3} style={s.th}>क्र.सं.</th>
-                <th colSpan={2} style={s.thGroup}>दर्ता नम्बर</th>
-                <th colSpan={2} style={s.thGroup}>सेवाग्राहीको</th>
-                <th colSpan={2} style={s.thGroup}>लिङ्ग</th>
-                <th colSpan={4} style={s.thGroup}>ठेगाना</th>
-                <th rowSpan={3} style={s.th}>सम्पर्क नम्बर</th>
-                <th rowSpan={3} style={s.th}>सेवाको किसिम</th>
-                <th rowSpan={3} style={s.th}>निःशुल्क/ शुल्क रू.</th>
-                <th rowSpan={3} style={s.th}>निःशुल्क गरिनुको कारण</th>
-                <th rowSpan={3} style={s.th}>वडाको सिफारिस</th>
-                <th rowSpan={3} style={s.th}>सहुलियत प्राप्त भएको / नभएको</th>
-              </tr>
-              {/* Row 2 — sub-group headers */}
-              <tr>
-                <th rowSpan={2} style={s.th}>पहिलो पटक</th>
-                <th rowSpan={2} style={s.th}>पुनरावृत</th>
-                <th rowSpan={2} style={s.th}>नाम</th>
-                <th rowSpan={2} style={s.th}>जाती थर</th>
-                <th rowSpan={2} style={s.th}>उमेर</th>
-                <th colSpan={2} style={s.thGroup}>जिल्ला</th>
-                <th colSpan={2} style={s.thGroup}>गाउँ / नगरपालिका</th>
-              </tr>
-              {/* Row 3 — leaf headers */}
-              <tr>
-                <th style={s.th}>वडा नम्बर</th>
-                <th style={s.th}>टोल</th>
-                <th style={s.th}>वडा नम्बर</th>
-                <th style={s.th}>टोल</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pageData.length === 0 ? (
+      {/* Body */}
+      <div style={s.body}>
+        <div style={s.card}>
+          <div style={s.tableWrap}>
+            <table style={s.table}>
+              <thead>
                 <tr>
-                  <td colSpan={19} style={s.noDataTd}>No data available in table</td>
+                  <th style={s.th}>ID</th>
+                  <th style={s.th}>मिति</th>
+                  <th style={s.th}>दर्ता नं.</th>
+                  <th style={s.th}>Visit</th>
+                  <th style={s.th}>नाम</th>
+                  <th style={s.th}>लिङ्ग</th>
+                  <th style={s.th}>उमेर</th>
+                  <th style={s.th}>सम्पर्क</th>
+                  <th style={s.th}>प्रदेश</th>
+                  <th style={s.th}>वडा</th>
+                  <th style={s.th}>टोल</th>
+                  <th style={s.th}>शुल्क</th>
+                  <th style={s.th}>कार्य</th>
                 </tr>
-              ) : (
-                pageData.map((row, i) => (
-                  <tr key={i}>
-                    <td style={s.td(i%2!==0)}>
-                      <button style={{ background:"#1e88e5", color:"white", border:"none", borderRadius:3, padding:"2px 8px", cursor:"pointer", fontSize:11 }}>
-                        कार्य
-                      </button>
-                    </td>
-                    <td style={s.td(i%2!==0)}>{row.miti}</td>
-                    <td style={s.td(i%2!==0)}>{row.sn}</td>
-                    <td style={s.td(i%2!==0)}>{row.firstReg}</td>
-                    <td style={s.td(i%2!==0)}>{row.revisit}</td>
-                    <td style={s.td(i%2!==0)}>{row.name}</td>
-                    <td style={s.td(i%2!==0)}>{row.caste}</td>
-                    <td style={s.td(i%2!==0)}>{row.age}</td>
-                    <td style={s.td(i%2!==0)}>{row.districtWard}</td>
-                    <td style={s.td(i%2!==0)}>{row.districtTol}</td>
-                    <td style={s.td(i%2!==0)}>{row.municipalityWard}</td>
-                    <td style={s.td(i%2!==0)}>{row.municipalityTol}</td>
-                    <td style={s.td(i%2!==0)}>{row.contact}</td>
-                    <td style={s.td(i%2!==0)}>{row.serviceType}</td>
-                    <td style={s.td(i%2!==0)}>{row.feeStatus}</td>
-                    <td style={s.td(i%2!==0)}>{row.freeReason}</td>
-                    <td style={s.td(i%2!==0)}>{row.wardRecommendation}</td>
-                    <td style={s.td(i%2!==0)}>{row.subsidyReceived}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+              </thead>
 
-          {/* Pagination */}
-          <div style={s.paginationRow}>
-            <button style={s.pageBtn} disabled={page<=1} onClick={() => setPage(p => Math.max(1,p-1))}>
-              Previous
-            </button>
-            <button style={s.pageBtn} disabled={page>=totalPages} onClick={() => setPage(p => Math.min(totalPages,p+1))}>
-              Next
-            </button>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="13" style={s.loading}>
+                      Loading...
+                    </td>
+                  </tr>
+                ) : pageData.length === 0 ? (
+                  <tr>
+                    <td colSpan="13" style={s.noData}>
+                      No data available
+                    </td>
+                  </tr>
+                ) : (
+                  pageData.map((row, i) => (
+                    <tr key={row.id}>
+                      <td style={s.td(i % 2)}>
+                        {row.id}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {formatDate(row.entry_date)}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.master_number}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.visit_type}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.first_name} {row.last_name}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.gender}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.age}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.contact_number}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.province}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.ward_number}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {row.locality}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        {feeText(row)}
+                      </td>
+
+                      <td style={s.td(i % 2)}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 6,
+                            justifyContent: "center",
+                          }}
+                        >
+                          <button
+                            style={s.btnBlue}
+                            onClick={() =>
+                              window.print()
+                            }
+                          >
+                            Print
+                          </button>
+
+                          <button
+                            style={s.btnRed}
+                            onClick={() =>
+                              handleDelete(row.id)
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer */}
+          <div style={s.footer}>
+            <div>
+              Total Records: {filtered.length}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+              }}
+            >
+              <button
+                style={s.pageBtn}
+                disabled={page <= 1}
+                onClick={() =>
+                  setPage((p) => p - 1)
+                }
+              >
+                Previous
+              </button>
+
+              <span>
+                Page {page} / {totalPages}
+              </span>
+
+              <button
+                style={s.pageBtn}
+                disabled={page >= totalPages}
+                onClick={() =>
+                  setPage((p) => p + 1)
+                }
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>

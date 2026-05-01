@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 // ── Inline styles — no Tailwind dependency ────────────────────────────────────
 
@@ -139,7 +140,12 @@ const S = {
     cursor: "pointer",
     whiteSpace: "nowrap",
   },
-  cb: { accentColor: "#0d9488", width: "13px", height: "13px", cursor: "pointer" },
+  cb: {
+    accentColor: "#0d9488",
+    width: "13px",
+    height: "13px",
+    cursor: "pointer",
+  },
   sep: { color: "#9ca3af", fontSize: "13px" },
 
   kisimGrid: {
@@ -189,95 +195,260 @@ const PRADESH_OPTIONS = [
 ];
 
 const KISIM_OPTIONS = [
-  { value: "samanya",           label: "सामान्य उपचार सेवा" },
+  { value: "samanya", label: "सामान्य उपचार सेवा" },
   { value: "panchakarma_purva", label: "पञ्चकर्म (पूर्वकर्म / उपकर्म) सेवा" },
   { value: "panchakarma_pradhan", label: "पञ्चकर्म (प्रधानकर्म) सेवा" },
-  { value: "ksharsutra",        label: "क्षारसूत्र सेवा" },
-  { value: "upcharatmak",       label: "उपचारात्मक योग सेवा" },
-  { value: "jestha",            label: "जेष्ठ नागरिक सेवा" },
-  { value: "stanpayi",          label: "स्तनपायी आमा तथा शिशु सेवा" },
-  { value: "anya",              label: "अन्य सेवा" },
+  { value: "ksharsutra", label: "क्षारसूत्र सेवा" },
+  { value: "upcharatmak", label: "उपचारात्मक योग सेवा" },
+  { value: "jestha", label: "जेष्ठ नागरिक सेवा" },
+  { value: "stanpayi", label: "स्तनपायी आमा तथा शिशु सेवा" },
+  { value: "anya", label: "अन्य सेवा" },
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function MasterRegisterCreate() {
+  const [search, setSearch] = useState({
+    searchMul: "",
+    searchPura: "",
+    searchSamparka: "",
+  });
   const [form, setForm] = useState({
-    searchMul: "", searchPura: "", searchSamparka: "",
-    isPahiloPatak: false, isPunarabrutt: false,
+    visitType: "",
     mulDartaNumber: "",
-    sewagraheeName: "", sewagraheeThar: "",
+    sewagraheeName: "",
+    sewagraheeThar: "",
     kisim: [],
-    jati: "", linga: "",
-    shulkRu: "10", nisShulk: false, sahuliyat: false,
-    umer: "", samparkNumber: "",
-    prepsonSanstha: "", pradesh: "",
-    kaifiyat: "", wadaNumber: "", tol: "", janmaMiti: "",
+    jati: "",
+    linga: "",
+    shulkRu: "10",
+    nisShulk: false,
+    sahuliyat: false,
+    umer: "",
+    samparkNumber: "",
+    prepsonSanstha: "",
+    pradesh: "",
+    kaifiyat: "",
+    wadaNumber: "",
+    tol: "",
+    janmaMiti: "",
   });
 
-  const today = "18/01/2083";
+  const [errors, setErrors] = useState({});
+
+  const today = new Date().toLocaleDateString("en-GB");
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
   const tog = (f) => () => setForm((p) => ({ ...p, [f]: !p[f] }));
   const togKisim = (v) =>
     setForm((p) => ({
       ...p,
-      kisim: p.kisim.includes(v) ? p.kisim.filter((k) => k !== v) : [...p.kisim, v],
+      kisim: p.kisim.includes(v)
+        ? p.kisim.filter((k) => k !== v)
+        : [...p.kisim, v],
     }));
 
-  const handleSubmit = (e) => {
+  const setSearchField = (field) => (e) =>
+    setSearch((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!form.mulDartaNumber.trim())
+      newErrors.mulDartaNumber = "मूल दर्ता नम्बर आवश्यक छ";
+    if (!form.visitType) newErrors.visitType = "छनोट गर्नुहोस्";
+    if (!form.sewagraheeName.trim()) newErrors.sewagraheeName = "नाम आवश्यक छ";
+    if (!form.sewagraheeThar.trim()) newErrors.sewagraheeThar = "थर आवश्यक छ";
+    if (!form.jati) newErrors.jati = "जाती आवश्यक छ";
+    if (!form.linga) newErrors.linga = "लिङ्ग आवश्यक छ";
+    if (!form.umer.trim()) newErrors.umer = "उमेर आवश्यक छ";
+    if (!form.samparkNumber.trim())
+      newErrors.samparkNumber = "सम्पर्क नम्बर आवश्यक छ";
+    if (!form.pradesh) newErrors.pradesh = "प्रदेश आवश्यक छ";
+    if (!form.wadaNumber.trim()) newErrors.wadaNumber = "वडा नम्बर आवश्यक छ";
+    if (!form.tol.trim()) newErrors.tol = "टोल आवश्यक छ";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("फारम सफलतापूर्वक बुझाइयो!");
+    if (!validateForm()) return;
+
+    try {
+      const payload = {
+        masterNumber: form.mulDartaNumber,
+        entryDate: new Date().toISOString().split("T")[0],
+
+        visitType: form.visitType,
+
+        firstName: form.sewagraheeName,
+        lastName: form.sewagraheeThar,
+
+        serviceTypes: form.kisim,
+
+        feeAmount: Number(form.shulkRu),
+        isFree: form.nisShulk,
+        hasConcession: form.sahuliyat,
+
+        referralInstitution: form.prepsonSanstha,
+        remarks: form.kaifiyat,
+
+        caste: form.jati,
+        gender: form.linga,
+        age: Number(form.umer),
+        contactNumber: form.samparkNumber,
+
+        province: form.pradesh,
+        wardNumber: form.wadaNumber,
+        locality: form.tol,
+
+        birthDate: form.janmaMiti || null,
+
+        createdBy: 1,
+      };
+
+      const res = await axios.post(
+        "http://localhost:5000/api/common/master-register",
+        payload,
+      );
+
+      alert("डेटा सफलतापूर्वक सेभ भयो!");
+      console.log(res.data);
+    } catch (error) {
+      console.error(error);
+      alert("डेटा सेभ गर्न मिलेन!");
+    }
   };
 
   return (
     <div style={S.page}>
       <div style={S.card}>
-
         {/* Header */}
         <div style={S.pageTitle}>मूल दर्ता</div>
         <div style={S.breadcrumb}>
-          <span style={S.link}>गृहपृष्ठ</span>{" / "}मूल दर्ता दर्ता
+          <span style={S.link}>गृहपृष्ठ</span>
+          {" / "}मूल दर्ता दर्ता
         </div>
 
         <form onSubmit={handleSubmit}>
-
           {/* Search row */}
           <div style={S.searchRow}>
-            <input style={S.input} placeholder="मूल दर्ता नम्बर *" value={form.searchMul} onChange={set("searchMul")} />
-            <input style={S.input} placeholder="पुरा नाम" value={form.searchPura} onChange={set("searchPura")} />
-            <input style={S.input} placeholder="सम्पर्क नम्बर" value={form.searchSamparka} onChange={set("searchSamparka")} />
-            <button type="button" style={S.searchBtn}>🔍</button>
+            <input
+              style={S.input}
+              placeholder="मूल दर्ता नम्बर"
+              value={search.searchMul}
+              onChange={setSearchField("searchMul")}
+            />
+
+            <input
+              style={S.input}
+              placeholder="पुरा नाम"
+              value={search.searchPura}
+              onChange={setSearchField("searchPura")}
+            />
+            <input
+              style={S.input}
+              placeholder="सम्पर्क नम्बर"
+              value={search.searchSamparka}
+              onChange={setSearchField("searchSamparka")}
+            />
+            <button type="button" style={S.searchBtn}>
+              🔍
+            </button>
           </div>
 
           {/* Miti */}
           <div style={{ marginBottom: "16px" }}>
             <span style={S.label}>मिति :</span>
-            <input style={{ ...S.inputRO, width: "160px" }} value={today} readOnly />
+            <input
+              style={{ ...S.inputRO, width: "160px" }}
+              value={today}
+              readOnly
+            />
           </div>
 
           <div style={S.divider} />
 
           {/* Main 2-col body */}
           <div style={S.twoColMain}>
-
             {/* ── LEFT ── */}
             <div style={S.col}>
-
               {/* Mul Darta + checkboxes */}
               <div>
                 <div style={S.cbRow}>
-                  <span style={{ fontSize: "13px", fontWeight: "500", color: "#374151" }}>मूल दर्ता नम्बर /</span>
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#374151",
+                    }}
+                  >
+                    मूल दर्ता नम्बर /
+                  </span>
+
                   <label style={S.cbLabel}>
-                    <input type="checkbox" style={S.cb} checked={form.isPahiloPatak} onChange={tog("isPahiloPatak")} />
+                    <input
+                      type="radio"
+                      name="visitType"
+                      style={S.cb}
+                      checked={form.visitType === "first"}
+                      onChange={() =>
+                        setForm((p) => ({ ...p, visitType: "first" }))
+                      }
+                    />
                     पहिलो पटक
                   </label>
+
                   <span style={S.sep}>/</span>
+
                   <label style={S.cbLabel}>
-                    <input type="checkbox" style={S.cb} checked={form.isPunarabrutt} onChange={tog("isPunarabrutt")} />
+                    <input
+                      type="radio"
+                      name="visitType"
+                      style={S.cb}
+                      checked={form.visitType === "repeat"}
+                      onChange={() =>
+                        setForm((p) => ({ ...p, visitType: "repeat" }))
+                      }
+                    />
                     पुनरावृत्त
                   </label>
                 </div>
-                <input style={S.input} placeholder="मूल दर्ता नम्बर *" value={form.mulDartaNumber} onChange={set("mulDartaNumber")} />
+
+                {errors.visitType && (
+                  <div
+                    style={{
+                      color: "#dc2626",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.visitType}
+                  </div>
+                )}
+                <input
+                  style={{
+                    ...S.input,
+                    borderColor: errors.mulDartaNumber ? "#dc2626" : "#d1d5db",
+                  }}
+                  placeholder="मूल दर्ता नम्बर *"
+                  value={form.mulDartaNumber}
+                  onChange={set("mulDartaNumber")}
+                />
+
+                {errors.mulDartaNumber && (
+                  <div
+                    style={{
+                      color: "#dc2626",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.mulDartaNumber}
+                  </div>
+                )}
               </div>
 
               {/* Kisim */}
@@ -286,7 +457,12 @@ export default function MasterRegisterCreate() {
                 <div style={S.kisimGrid}>
                   {KISIM_OPTIONS.map((opt) => (
                     <label key={opt.value} style={S.cbLabel}>
-                      <input type="checkbox" style={S.cb} checked={form.kisim.includes(opt.value)} onChange={() => togKisim(opt.value)} />
+                      <input
+                        type="checkbox"
+                        style={S.cb}
+                        checked={form.kisim.includes(opt.value)}
+                        onChange={() => togKisim(opt.value)}
+                      />
                       {opt.label}
                     </label>
                   ))}
@@ -296,100 +472,335 @@ export default function MasterRegisterCreate() {
               {/* Shulk */}
               <div>
                 <div style={S.cbRow}>
-                  <span style={{ fontSize: "13px", fontWeight: "500", color: "#374151" }}>शुल्क रू. /</span>
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: "500",
+                      color: "#374151",
+                    }}
+                  >
+                    शुल्क रू. /
+                  </span>
                   <label style={S.cbLabel}>
-                    <input type="checkbox" style={S.cb} checked={form.nisShulk} onChange={tog("nisShulk")} />
+                    <input
+                      type="checkbox"
+                      style={S.cb}
+                      checked={form.nisShulk}
+                      onChange={() =>
+                        setForm((p) => ({
+                          ...p,
+                          nisShulk: !p.nisShulk,
+                          shulkRu: p.nisShulk ? "10" : "0",
+                        }))
+                      }
+                    />
                     नि:शुल्क
                   </label>
                   <span style={S.sep}>/</span>
                   <label style={S.cbLabel}>
-                    <input type="checkbox" style={S.cb} checked={form.sahuliyat} onChange={tog("sahuliyat")} />
+                    <input
+                      type="checkbox"
+                      style={S.cb}
+                      checked={form.sahuliyat}
+                      onChange={tog("sahuliyat")}
+                    />
                     सहुलियत प्राप्त भएको
                   </label>
                 </div>
-                <input style={S.input} value={form.shulkRu} onChange={set("shulkRu")} />
+                <input
+                  style={{
+                    ...S.input,
+                    backgroundColor: form.nisShulk ? "#f3f4f6" : "#fff",
+                  }}
+                  value={form.shulkRu}
+                  onChange={set("shulkRu")}
+                  disabled={form.nisShulk}
+                />
               </div>
 
               {/* Prepson Sanstha */}
               <div>
                 <label style={S.label}>प्रेषण भई आएको संस्थाको नाम</label>
-                <input style={S.input} placeholder="प्रेषण भई आएको संस्थाको नाम" value={form.prepsonSanstha} onChange={set("prepsonSanstha")} />
+                <input
+                  style={S.input}
+                  placeholder="प्रेषण भई आएको संस्थाको नाम"
+                  value={form.prepsonSanstha}
+                  onChange={set("prepsonSanstha")}
+                />
               </div>
 
               {/* Kaifiyat */}
               <div>
                 <label style={S.label}>कैफियत</label>
-                <textarea style={S.textarea} placeholder="कैफियत" value={form.kaifiyat} onChange={set("kaifiyat")} />
+                <textarea
+                  style={S.textarea}
+                  placeholder="कैफियत"
+                  value={form.kaifiyat}
+                  onChange={set("kaifiyat")}
+                />
               </div>
             </div>
 
             {/* ── RIGHT ── */}
             <div style={S.col}>
-
               {/* Sewagrahi */}
               <div>
                 <label style={S.label}>सेवाग्राहीको पुरा नाम</label>
                 <div style={S.twoCol}>
-                  <input style={S.input} placeholder="नाम *" value={form.sewagraheeName} onChange={set("sewagraheeName")} />
-                  <input style={S.input} placeholder="थर *" value={form.sewagraheeThar} onChange={set("sewagraheeThar")} />
+                  <div>
+                    <input
+                      style={{
+                        ...S.input,
+                        borderColor: errors.sewagraheeName
+                          ? "#dc2626"
+                          : "#d1d5db",
+                      }}
+                      placeholder="नाम *"
+                      value={form.sewagraheeName}
+                      onChange={set("sewagraheeName")}
+                    />
+                    {errors.sewagraheeName && (
+                      <div
+                        style={{
+                          color: "#dc2626",
+                          fontSize: "12px",
+                          marginTop: "4px",
+                        }}
+                      >
+                        {errors.sewagraheeName}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <input
+                      style={{
+                        ...S.input,
+                        borderColor: errors.sewagraheeThar
+                          ? "#dc2626"
+                          : "#d1d5db",
+                      }}
+                      placeholder="थर *"
+                      value={form.sewagraheeThar}
+                      onChange={set("sewagraheeThar")}
+                    />
+                    {errors.sewagraheeThar && (
+                      <div
+                        style={{
+                          color: "#dc2626",
+                          fontSize: "12px",
+                          marginTop: "4px",
+                        }}
+                      >
+                        {errors.sewagraheeThar}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Jati */}
               <div>
                 <label style={S.label}>जाती</label>
-                <select style={S.select} value={form.jati} onChange={set("jati")}>
+                <select
+                  style={{
+                    ...S.select,
+                    borderColor: errors.jati ? "#dc2626" : "#d1d5db",
+                  }}
+                  value={form.jati}
+                  onChange={set("jati")}
+                >
                   <option value="">जाती छनोट गर्नुहोस् *</option>
-                  {JATI_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  {JATI_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
                 </select>
+                {errors.jati && (
+                  <div
+                    style={{
+                      color: "#dc2626",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.jati}
+                  </div>
+                )}
               </div>
 
               {/* Linga */}
               <div>
                 <label style={S.label}>लिङ्ग</label>
-                <select style={S.select} value={form.linga} onChange={set("linga")}>
+                <select
+                  style={{
+                    ...S.select,
+                    borderColor: errors.linga ? "#dc2626" : "#d1d5db",
+                  }}
+                  value={form.linga}
+                  onChange={set("linga")}
+                >
                   <option value="">लिङ्ग छनोट गर्नुहोस् *</option>
-                  {LINGA_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  {LINGA_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
                 </select>
+                {errors.linga && (
+                  <div
+                    style={{
+                      color: "#dc2626",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.linga}
+                  </div>
+                )}
               </div>
 
               {/* Umer + Samparka */}
               <div style={S.twoCol}>
                 <div>
                   <label style={S.label}>उमेर</label>
-                  <input style={S.input} placeholder="उमेर *" value={form.umer} onChange={set("umer")} />
+                  <input
+                    style={{
+                      ...S.input,
+                      borderColor: errors.umer ? "#dc2626" : "#d1d5db",
+                    }}
+                    placeholder="उमेर *"
+                    value={form.umer}
+                    onChange={set("umer")}
+                  />
+                  {errors.umer && (
+                    <div
+                      style={{
+                        color: "#dc2626",
+                        fontSize: "12px",
+                        marginTop: "4px",
+                      }}
+                    >
+                      {errors.umer}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label style={S.label}>सम्पर्क नम्बर</label>
-                  <input style={S.input} placeholder="सम्पर्क नम्बर *" value={form.samparkNumber} onChange={set("samparkNumber")} />
+                  <input
+                    style={{
+                      ...S.input,
+                      borderColor: errors.samparkNumber ? "#dc2626" : "#d1d5db",
+                    }}
+                    placeholder="सम्पर्क नम्बर *"
+                    value={form.samparkNumber}
+                    onChange={set("samparkNumber")}
+                  />
+                  {errors.samparkNumber && (
+                    <div
+                      style={{
+                        color: "#dc2626",
+                        fontSize: "12px",
+                        marginTop: "4px",
+                      }}
+                    >
+                      {errors.samparkNumber}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Pradesh */}
               <div>
                 <label style={S.label}>प्रदेश</label>
-                <select style={S.select} value={form.pradesh} onChange={set("pradesh")}>
+                <select
+                  style={{
+                    ...S.select,
+                    borderColor: errors.pradesh ? "#dc2626" : "#d1d5db",
+                  }}
+                  value={form.pradesh}
+                  onChange={set("pradesh")}
+                >
                   <option value="">प्रदेश छनोट गर्नुहोस् *</option>
-                  {PRADESH_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  {PRADESH_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
                 </select>
+                {errors.pradesh && (
+                  <div
+                    style={{
+                      color: "#dc2626",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {errors.pradesh}
+                  </div>
+                )}
               </div>
 
               {/* Wada + Tol */}
               <div style={S.twoCol}>
                 <div>
                   <label style={S.label}>वडा नम्बर</label>
-                  <input style={S.input} placeholder="वडा नम्बर *" value={form.wadaNumber} onChange={set("wadaNumber")} />
+                  <input
+                    style={{
+                      ...S.input,
+                      borderColor: errors.wadaNumber ? "#dc2626" : "#d1d5db",
+                    }}
+                    placeholder="वडा नम्बर *"
+                    value={form.wadaNumber}
+                    onChange={set("wadaNumber")}
+                  />
+                  {errors.wadaNumber && (
+                    <div
+                      style={{
+                        color: "#dc2626",
+                        fontSize: "12px",
+                        marginTop: "4px",
+                      }}
+                    >
+                      {errors.wadaNumber}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label style={S.label}>टोल</label>
-                  <input style={S.input} placeholder="टोल *" value={form.tol} onChange={set("tol")} />
+                  <input
+                    style={{
+                      ...S.input,
+                      borderColor: errors.tol ? "#dc2626" : "#d1d5db",
+                    }}
+                    placeholder="टोल *"
+                    value={form.tol}
+                    onChange={set("tol")}
+                  />
+                  {errors.tol && (
+                    <div
+                      style={{
+                        color: "#dc2626",
+                        fontSize: "12px",
+                        marginTop: "4px",
+                      }}
+                    >
+                      {errors.tol}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Janma Miti */}
               <div>
                 <label style={S.label}>जन्म मिति</label>
-                <input style={{ ...S.inputRO, width: "100%" }} placeholder="मिति *" value={form.janmaMiti} readOnly />
+                <input
+                  type="date"
+                  style={{ ...S.input, width: "100%" }}
+                  value={form.janmaMiti}
+                  onChange={set("janmaMiti")}
+                />
               </div>
             </div>
           </div>
@@ -399,8 +810,12 @@ export default function MasterRegisterCreate() {
             <button
               type="submit"
               style={S.submitBtn}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#15803d")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#16a34a")}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#15803d")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#16a34a")
+              }
             >
               बुझाउनुहोस्
             </button>
