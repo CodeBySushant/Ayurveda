@@ -1,6 +1,7 @@
-// src/pages/AyurvedaServiceRegister/TherapeuticServiceRegisterDailyList.jsx
+// src/pages/AyurvedaServiceRegister/AkupancharServiceRegisterDailyList.jsx
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import axios from "axios";
 import { Search } from "lucide-react";
 
 const styles = {
@@ -170,23 +171,110 @@ const styles = {
 /* Future DB rows can come from API */
 const initialRows = [];
 
-export default function TherapeuticServiceRegisterDailyList() {
-  const [rows] = useState(initialRows);
+export default function AkupancharServiceRegisterDailyList() {
+  const [rows, setRows] = useState(initialRows);
+
+  const [loading, setLoading] = useState(true);
 
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [registerNo, setRegisterNo] = useState("");
-  const [date, setDate] = useState("18/01/2083");
+  const [date, setDate] = useState("");
+
+  const [details, setDetails] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDelete = async (id) => {
+    const ok = window.confirm("Delete this record?");
+    if (!ok) return;
+
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/ayurveda/akupanchar-service/${id}`,
+      );
+
+      fetchData();
+    } catch (error) {
+      alert("Delete failed");
+    }
+  };
+
+  const handleView = async (id) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/ayurveda/akupanchar-service/${id}/items`,
+      );
+
+      setDetails(res.data || []);
+      setShowModal(true);
+    } catch (error) {
+      alert("Failed to fetch details");
+    }
+  };
+
+  const handlePrint = (row) => {
+    const w = window.open("", "_blank");
+
+    w.document.write(`
+    <html>
+      <head>
+        <title>Print</title>
+        <style>
+          body{font-family:Arial;padding:30px}
+          table{width:100%;border-collapse:collapse}
+          td,th{border:1px solid #ccc;padding:8px}
+        </style>
+      </head>
+      <body>
+        <h2>Akupanchar Service</h2>
+        <table>
+          <tr><th>No</th><td>${row.service_number}</td></tr>
+          <tr><th>Name</th><td>${row.naam} ${row.thar}</td></tr>
+          <tr><th>Date</th><td>${row.miti}</td></tr>
+          <tr><th>District</th><td>${row.jilla}</td></tr>
+        </table>
+        <script>
+          window.onload=function(){
+            window.print();
+            window.onafterprint=()=>window.close();
+          }
+        </script>
+      </body>
+    </html>
+  `);
+
+    w.document.close();
+  };
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const res = await axios.get(
+        "http://localhost:5000/api/ayurveda/akupanchar-service",
+      );
+
+      setRows(res.data || []);
+    } catch (error) {
+      alert("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   /* Future filtering for backend */
   const filteredRows = useMemo(() => {
     return rows.filter((item) => {
       const matchNo = registerNo
-        ? item.masterRegisterNo?.includes(registerNo)
+        ? String(item.mul_darta || "").includes(registerNo)
         : true;
 
-      const matchDate = date ? item.date === date : true;
+      const matchDate = date ? String(item.miti || "").trim() === date : true;
 
       return matchNo && matchDate;
     });
@@ -211,12 +299,12 @@ export default function TherapeuticServiceRegisterDailyList() {
     <div style={styles.page}>
       {/* Top Title */}
       <div style={styles.topBar}>
-        <div style={styles.heading}>थेरापी सेवा दैनिक सूची</div>
+        <div style={styles.heading}>अकुपुञ्चर सेवा दैनिक सूची</div>
 
         <div style={styles.breadcrumb}>
           <span style={styles.home}>गृहपृष्ठ</span>
           <span>/</span>
-          <span>थेरापी सेवा दैनिक सूची</span>
+          <span>अकुपुञ्चर सेवा दैनिक सूची</span>
         </div>
       </div>
 
@@ -258,7 +346,7 @@ export default function TherapeuticServiceRegisterDailyList() {
               onChange={(e) => setDate(e.target.value)}
             />
 
-            <button style={styles.searchBtn}>
+            <button style={styles.searchBtn} type="button" onClick={fetchData}>
               <Search size={18} />
             </button>
           </div>
@@ -269,30 +357,64 @@ export default function TherapeuticServiceRegisterDailyList() {
           <table style={styles.table}>
             <thead>
               <tr>
-                <th rowSpan="3" style={styles.th}>मिति</th>
-                <th rowSpan="3" style={styles.th}>क्र.सं.</th>
-                <th rowSpan="3" style={styles.th}>मूल दर्ता नम्बर</th>
+                <th rowSpan="3" style={styles.th}>
+                  मिति
+                </th>
+                <th rowSpan="3" style={styles.th}>
+                  क्र.सं.
+                </th>
+                <th rowSpan="3" style={styles.th}>
+                  मूल दर्ता नम्बर
+                </th>
 
-                <th colSpan="2" style={styles.th}>सेवा दर्ता नम्बर</th>
+                <th colSpan="2" style={styles.th}>
+                  सेवा दर्ता नम्बर
+                </th>
 
-                <th colSpan="2" style={styles.th}>सेवाग्राहीको</th>
+                <th colSpan="2" style={styles.th}>
+                  सेवाग्राहीको
+                </th>
 
-                <th rowSpan="3" style={styles.th}>जाती</th>
-                <th rowSpan="3" style={styles.th}>लिङ्ग</th>
-                <th rowSpan="3" style={styles.th}>उमेर</th>
+                <th rowSpan="3" style={styles.th}>
+                  जाती
+                </th>
+                <th rowSpan="3" style={styles.th}>
+                  लिङ्ग
+                </th>
+                <th rowSpan="3" style={styles.th}>
+                  उमेर
+                </th>
 
-                <th colSpan="4" style={styles.th}>ठेगाना</th>
+                <th colSpan="4" style={styles.th}>
+                  ठेगाना
+                </th>
 
-                <th rowSpan="3" style={styles.th}>सम्पर्क नम्बर</th>
+                <th rowSpan="3" style={styles.th}>
+                  सम्पर्क नम्बर
+                </th>
 
-                <th colSpan="2" style={styles.th}>स्वास्थ्य अवस्था</th>
+                <th colSpan="2" style={styles.th}>
+                  स्वास्थ्य अवस्था
+                </th>
 
-                <th rowSpan="3" style={styles.th}>कार्य</th>
+                <th
+                  rowSpan="3"
+                  style={{
+                    ...styles.th,
+                    minWidth: "180px",
+                  }}
+                >
+                  कार्य
+                </th>
               </tr>
 
               <tr>
-                <th rowSpan="2" style={styles.th}>मिति</th>
-                <th rowSpan="2" style={styles.th}>नम्बर</th>
+                <th rowSpan="2" style={styles.th}>
+                  मिति
+                </th>
+                <th rowSpan="2" style={styles.th}>
+                  नम्बर
+                </th>
 
                 <th style={styles.th}>नाम</th>
                 <th style={styles.th}>थर</th>
@@ -321,33 +443,117 @@ export default function TherapeuticServiceRegisterDailyList() {
             </thead>
 
             <tbody>
-              {paginatedRows.length === 0 ? (
+              {loading ? (
                 <tr>
                   <td colSpan="18" style={styles.noData}>
-                    No data available in table
+                    Loading...
+                  </td>
+                </tr>
+              ) : paginatedRows.length === 0 ? (
+                <tr>
+                  <td colSpan="18" style={styles.noData}>
+                    No data available
                   </td>
                 </tr>
               ) : (
                 paginatedRows.map((row, index) => (
-                  <tr key={index}>
-                    <td style={styles.td}>{row.date}</td>
+                  <tr key={row.id}>
+                    <td style={styles.td}>{row.miti}</td>
+
                     <td style={styles.td}>{start + index + 1}</td>
-                    <td style={styles.td}>{row.masterRegisterNo}</td>
-                    <td style={styles.td}>{row.serviceDate}</td>
-                    <td style={styles.td}>{row.serviceNo}</td>
-                    <td style={styles.td}>{row.firstName}</td>
-                    <td style={styles.td}>{row.lastName}</td>
-                    <td style={styles.td}>{row.caste}</td>
-                    <td style={styles.td}>{row.gender}</td>
-                    <td style={styles.td}>{row.age}</td>
-                    <td style={styles.td}>{row.district}</td>
-                    <td style={styles.td}>{row.municipality}</td>
-                    <td style={styles.td}>{row.ward}</td>
-                    <td style={styles.td}>{row.tole}</td>
-                    <td style={styles.td}>{row.contact}</td>
-                    <td style={styles.td}>{row.bp}</td>
-                    <td style={styles.td}>{row.disease}</td>
-                    <td style={styles.td}>Edit</td>
+
+                    <td style={styles.td}>{row.mul_darta}</td>
+
+                    <td style={styles.td}>{row.miti}</td>
+
+                    <td style={styles.td}>{row.service_number}</td>
+
+                    <td style={styles.td}>{row.naam}</td>
+
+                    <td style={styles.td}>{row.thar}</td>
+
+                    <td style={styles.td}>{row.jaati}</td>
+
+                    <td style={styles.td}>{row.linga}</td>
+
+                    <td style={styles.td}>{row.umer}</td>
+
+                    <td style={styles.td}>{row.jilla}</td>
+
+                    <td style={styles.td}>-</td>
+
+                    <td style={styles.td}>{row.wada_number}</td>
+
+                    <td style={styles.td}>{row.tol}</td>
+
+                    <td style={styles.td}>{row.sampark_number}</td>
+
+                    <td style={styles.td}>{row.raktachap}</td>
+
+                    <td style={styles.td}>
+                      {row.prakriti}
+                      <br />
+                      {row.rog}
+                    </td>
+
+                    <td style={styles.td}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "6px",
+                          justifyContent: "center",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handlePrint(row)}
+                          style={{
+                            background: "#2563eb",
+                            color: "#fff",
+                            border: "none",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Print
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(row.id)}
+                          style={{
+                            background: "#dc2626",
+                            color: "#fff",
+                            border: "none",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleView(row.id)}
+                          style={{
+                            background: "#16a34a",
+                            color: "#fff",
+                            border: "none",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          View
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
@@ -378,6 +584,62 @@ export default function TherapeuticServiceRegisterDailyList() {
           </button>
         </div>
       </div>
+      {showModal && (
+        <div
+          onClick={() => setShowModal(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.45)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 999,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff",
+              padding: "20px",
+              width: "650px",
+              maxHeight: "80vh",
+              overflow: "auto",
+            }}
+          >
+            <h3>सेवा विवरण</h3>
+
+            {details.length === 0 ? (
+              <p>No items</p>
+            ) : (
+              details.map((item, i) => (
+                <div
+                  key={i}
+                  style={{
+                    borderBottom: "1px solid #ddd",
+                    padding: "8px 0",
+                  }}
+                >
+                  <strong>
+                    {i + 1}. {item.sewa}
+                  </strong>
+                  <div>मिति: {item.miti}</div>
+                  <div>जटिलता: {item.jatilata}</div>
+                  <div>परीक्षण: {item.parikshan_sallah}</div>
+                  <div>कैफियत: {item.kaifiyat}</div>
+                </div>
+              ))
+            )}
+
+            <button
+              onClick={() => setShowModal(false)}
+              style={{ marginTop: "15px" }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

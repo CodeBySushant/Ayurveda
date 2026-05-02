@@ -398,3 +398,52 @@ CREATE TABLE emergency_medicines (
   REFERENCES emergency_services(id)
   ON DELETE CASCADE
 );
+
+CREATE TABLE akupanchar_services (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  service_number VARCHAR(30) UNIQUE,
+
+  miti VARCHAR(20),
+  mul_darta VARCHAR(50),
+
+  raktachap VARCHAR(50),
+  taul VARCHAR(50),
+  fbs VARCHAR(50),
+
+  prakriti VARCHAR(100),
+  rog VARCHAR(150),
+  parikshan VARCHAR(255),
+
+  naam VARCHAR(120),
+  thar VARCHAR(120),
+  full_name VARCHAR(255),
+
+  umer VARCHAR(30),
+  linga VARCHAR(30),
+
+  sampark_number VARCHAR(30),
+  jaati VARCHAR(100),
+
+  wada_number VARCHAR(30),
+  tol VARCHAR(120),
+  jilla VARCHAR(120),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE akupanchar_service_items (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  service_id INT,
+
+  miti VARCHAR(20),
+  sewa VARCHAR(150),
+  jatilata TEXT,
+  parikshan_sallah TEXT,
+  kaifiyat TEXT,
+
+  FOREIGN KEY (service_id)
+  REFERENCES akupanchar_services(id)
+  ON DELETE CASCADE
+);

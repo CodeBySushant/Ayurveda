@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap');
@@ -189,16 +190,54 @@ const styles = `
   }
 `;
 
-const PRAKRITI_OPTIONS = ["वात", "पित्त", "कफ", "वात-पित्त", "पित्त-कफ", "वात-कफ", "त्रिदोष"];
-const ROG_OPTIONS = ["मधुमेह", "उच्च रक्तचाप", "गठिया", "पीठ दुखाई", "सिरदर्द", "अन्य"];
+const PRAKRITI_OPTIONS = [
+  "वात",
+  "पित्त",
+  "कफ",
+  "वात-पित्त",
+  "पित्त-कफ",
+  "वात-कफ",
+  "त्रिदोष",
+];
+const ROG_OPTIONS = [
+  "मधुमेह",
+  "उच्च रक्तचाप",
+  "गठिया",
+  "पीठ दुखाई",
+  "सिरदर्द",
+  "अन्य",
+];
 const LINGA_OPTIONS = ["पुरुष", "महिला", "अन्य"];
-const JAATI_OPTIONS = ["ब्राह्मण/क्षेत्री", "जनजाति", "दलित", "मधेसी", "मुस्लिम", "अन्य"];
-const JILLA_OPTIONS = ["काठमाडौं", "ललितपुर", "भक्तपुर", "पोखरा", "चितवन", "धनुषा", "मोरङ", "सुनसरी"];
-const SEWA_OPTIONS = ["अकुपुञ्चर", "मर्दन", "पञ्चकर्म", "शिरोधारा", "नस्य", "बस्ती"];
+const JAATI_OPTIONS = [
+  "ब्राह्मण/क्षेत्री",
+  "जनजाति",
+  "दलित",
+  "मधेसी",
+  "मुस्लिम",
+  "अन्य",
+];
+const JILLA_OPTIONS = [
+  "काठमाडौं",
+  "ललितपुर",
+  "भक्तपुर",
+  "पोखरा",
+  "चितवन",
+  "धनुषा",
+  "मोरङ",
+  "सुनसरी",
+];
+const SEWA_OPTIONS = [
+  "अकुपुञ्चर",
+  "मर्दन",
+  "पञ्चकर्म",
+  "शिरोधारा",
+  "नस्य",
+  "बस्ती",
+];
 
 const emptyServiceRow = () => ({
   id: Date.now() + Math.random(),
-  miti: "",
+  miti: new Date().toLocaleDateString("en-GB"),
   sewa: "",
   jatilata: "",
   parikshan: "",
@@ -207,7 +246,7 @@ const emptyServiceRow = () => ({
 
 export default function AkupancharServiceRegister() {
   const [formData, setFormData] = useState({
-    miti: "18/01/2083",
+    miti: new Date().toLocaleDateString("en-GB"),
     mulDarta: "",
     raktachap: "",
     taul: "",
@@ -227,6 +266,7 @@ export default function AkupancharServiceRegister() {
   });
 
   const [serviceRows, setServiceRows] = useState([emptyServiceRow()]);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
@@ -234,7 +274,9 @@ export default function AkupancharServiceRegister() {
 
   const handleServiceChange = (id, field) => (e) => {
     setServiceRows((prev) =>
-      prev.map((row) => (row.id === id ? { ...row, [field]: e.target.value } : row))
+      prev.map((row) =>
+        row.id === id ? { ...row, [field]: e.target.value } : row,
+      ),
     );
   };
 
@@ -245,10 +287,66 @@ export default function AkupancharServiceRegister() {
     setServiceRows((prev) => prev.filter((r) => r.id !== id));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", { ...formData, serviceRows });
-    alert("फारम सफलतापूर्वक बुझाइयो!");
+
+    if (!formData.mulDarta.trim()) {
+      return alert("मूल दर्ता नम्बर आवश्यक छ");
+    }
+
+    if (!formData.naam.trim()) {
+      return alert("नाम आवश्यक छ");
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        ...formData,
+
+        items: serviceRows.map((row) => ({
+          miti: row.miti,
+          sewa: row.sewa,
+          jatilata: row.jatilata,
+          parikshan: row.parikshan,
+          kaifiyat: row.kaifiyat,
+        })),
+      };
+
+      const res = await axios.post(
+        "http://localhost:5000/api/ayurveda/akupanchar-service",
+        payload,
+      );
+
+      alert(`Saved Successfully\n${res.data.serviceNumber}`);
+
+      setFormData({
+        miti: new Date().toLocaleDateString("en-GB"),
+        mulDarta: "",
+        raktachap: "",
+        taul: "",
+        fbs: "",
+        prakriti: "",
+        rog: "",
+        parikshan: "",
+        naam: "",
+        thar: "",
+        umer: "",
+        linga: "",
+        samparkNumber: "",
+        jaati: "",
+        wadaNumber: "",
+        tol: "",
+        jilla: "",
+      });
+
+      setServiceRows([emptyServiceRow()]);
+    } catch (error) {
+      console.log(error);
+      alert("Save failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -330,7 +428,9 @@ export default function AkupancharServiceRegister() {
                       >
                         <option value="">प्रकृति छनोट गर्नहोस</option>
                         {PRAKRITI_OPTIONS.map((o) => (
-                          <option key={o} value={o}>{o}</option>
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -343,7 +443,9 @@ export default function AkupancharServiceRegister() {
                       >
                         <option value="">रोग छनोट गर्नहोस</option>
                         {ROG_OPTIONS.map((o) => (
-                          <option key={o} value={o}>{o}</option>
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -400,7 +502,9 @@ export default function AkupancharServiceRegister() {
                         >
                           <option value="">लिङ्ग छनोट गर्नहोस</option>
                           {LINGA_OPTIONS.map((o) => (
-                            <option key={o} value={o}>{o}</option>
+                            <option key={o} value={o}>
+                              {o}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -423,7 +527,9 @@ export default function AkupancharServiceRegister() {
                         >
                           <option value="">जाती छनोट गर्नहोस</option>
                           {JAATI_OPTIONS.map((o) => (
-                            <option key={o} value={o}>{o}</option>
+                            <option key={o} value={o}>
+                              {o}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -455,7 +561,9 @@ export default function AkupancharServiceRegister() {
                       >
                         <option value="">जिल्ला छनोट गर्नहोस</option>
                         {JILLA_OPTIONS.map((o) => (
-                          <option key={o} value={o}>{o}</option>
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -501,7 +609,9 @@ export default function AkupancharServiceRegister() {
                           >
                             <option value="">सेवा छनोट गर्नहोस</option>
                             {SEWA_OPTIONS.map((o) => (
-                              <option key={o} value={o}>{o}</option>
+                              <option key={o} value={o}>
+                                {o}
+                              </option>
                             ))}
                           </select>
                         </td>
@@ -535,14 +645,18 @@ export default function AkupancharServiceRegister() {
                             className="btn-add"
                             onClick={addRow}
                             title="थप्नुहोस्"
-                          >+</button>
+                          >
+                            +
+                          </button>
                           <button
                             type="button"
                             className="btn-remove"
                             onClick={() => removeRow(row.id)}
                             title="हटाउनुहोस्"
                             disabled={serviceRows.length === 1}
-                          >×</button>
+                          >
+                            ×
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -554,8 +668,16 @@ export default function AkupancharServiceRegister() {
 
           {/* Submit */}
           <div className="submit-wrap">
-            <button type="submit" className="btn-submit">
-              बुझाउनुहोस्
+            <button
+              type="submit"
+              className="btn-submit"
+              disabled={loading}
+              style={{
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+            >
+              {loading ? "Saving..." : "बुझाउनुहोस्"}
             </button>
           </div>
         </form>
