@@ -187,3 +187,45 @@ CREATE TABLE referral_medicines (
   REFERENCES referral_slips(id)
   ON DELETE CASCADE
 );
+
+CREATE TABLE return_slips (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  slip_number VARCHAR(30) UNIQUE,
+  form_date VARCHAR(20),
+
+  /* Section 1: Returning Info Giving Institution */
+  from_institution_name VARCHAR(150),
+  from_province VARCHAR(50),
+  from_ward VARCHAR(20),
+
+  /* Section 2: Sent To Institution */
+  to_institution_name VARCHAR(150),
+  to_address VARCHAR(200),
+
+  /* Section 3: Patient */
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  gender VARCHAR(20),
+  age VARCHAR(20),
+  patient_province VARCHAR(50),
+  patient_ward VARCHAR(20),
+  contact_visit_date VARCHAR(20),
+
+  /* Section 4: Provider Info */
+  provider_name VARCHAR(120),
+  provider_designation VARCHAR(120),
+  provider_date VARCHAR(20),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE return_services (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  return_id INT NOT NULL,
+  service_name VARCHAR(200),
+
+  FOREIGN KEY (return_id)
+  REFERENCES return_slips(id)
+  ON DELETE CASCADE
+);

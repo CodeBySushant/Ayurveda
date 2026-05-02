@@ -1,6 +1,7 @@
 const masterRegisterModel = require("../models/masterRegisterModel");
 const billingModel = require("../models/billingModel");
 const referralSlipModel = require("../models/referralSlipModel");
+const returnSlipModel = require("../models/returnSlipModel");
 
 /* Create */
 const createMasterRegister = (req, res) => {
@@ -235,6 +236,78 @@ const getReferralSlipItems = (req, res) => {
   );
 };
 
+/* Return Slip Create */
+const createReturnSlip = (req, res) => {
+  const {
+    services,
+    ...headerData
+  } = req.body;
+
+  returnSlipModel.createReturnSlip(
+    headerData,
+    services,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to save return slip",
+          error: err
+        });
+      }
+
+      res.status(201).json(result);
+    }
+  );
+};
+
+/* Return Slip Get All */
+const getReturnSlips = (req, res) => {
+  returnSlipModel.getAllReturnSlips(
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to fetch return slips"
+        });
+      }
+
+      res.json(result);
+    }
+  );
+};
+
+/* Return Slip Delete */
+const deleteReturnSlip = (req, res) => {
+  returnSlipModel.deleteReturnSlip(
+    req.params.id,
+    (err) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Delete failed"
+        });
+      }
+
+      res.json({
+        message: "Deleted successfully"
+      });
+    }
+  );
+};
+
+/* Return Slip Items */
+const getReturnSlipItems = (req, res) => {
+  returnSlipModel.getReturnItems(
+    req.params.id,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to fetch services"
+        });
+      }
+
+      res.json(result);
+    }
+  );
+};
+
 module.exports = {
   createMasterRegister,
   getMasterRegisters,
@@ -251,5 +324,10 @@ module.exports = {
   createReferralSlip,
   getReferralSlips,
   deleteReferralSlip,
-  getReferralSlipItems
+  getReferralSlipItems,
+
+  createReturnSlip,
+  getReturnSlips,
+  deleteReturnSlip,
+  getReturnSlipItems
 };

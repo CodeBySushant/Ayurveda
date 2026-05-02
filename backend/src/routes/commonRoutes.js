@@ -17,7 +17,12 @@ const {
   createReferralSlip,
   getReferralSlips,
   deleteReferralSlip,
-  getReferralSlipItems
+  getReferralSlipItems,
+
+  createReturnSlip,
+  getReturnSlips,
+  deleteReturnSlip,
+  getReturnSlipItems
 } = require("../controllers/commonController");
 
 /* Master Register Routes */
@@ -76,6 +81,28 @@ router.delete(
 router.get(
   "/referral-slip/:id/items",
   getReferralSlipItems
+);
+
+/* Return Slip Routes */
+
+router.post(
+  "/return-slip",
+  createReturnSlip
+);
+
+router.get(
+  "/return-slip",
+  getReturnSlips
+);
+
+router.delete(
+  "/return-slip/:id",
+  deleteReturnSlip
+);
+
+router.get(
+  "/return-slip/:id/items",
+  getReturnSlipItems
 );
 
 module.exports = router;
