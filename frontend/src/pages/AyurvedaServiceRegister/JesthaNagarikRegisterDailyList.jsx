@@ -1,34 +1,7 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import axios from "axios";
 
-// ─────────────────────────────────────────────
-// CONFIG — swap API_URL with the real endpoint
-// ─────────────────────────────────────────────
-const API_URL = "/api/jeshtha-nagarik-seva"; // TODO: replace with real URL
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
-
-// ─────────────────────────────────────────────
-// Static sample data for UI preview
-// Remove / replace once connected to backend
-// ─────────────────────────────────────────────
-const SAMPLE_DATA = [
-  // Uncomment and fill to test UI:
-  // {
-  //   id: 1,
-  //   mulDartaNumber: "001-2083",
-  //   sewaDartaNumber: "S-001",
-  //   sewaDartaDate: "18/01/2083",
-  //   fullName: "राम बहादुर श्रेष्ठ",
-  //   caste: "क्षेत्री",
-  //   age: "72",
-  //   gender: "पुरुष",
-  //   district: "काठमाडौं",
-  //   wardNumber: "05",
-  //   municipality: "काठमाडौं महानगरपालिका",
-  //   tol: "बानेश्वर",
-  //   contact: "9841000000",
-  //   referredBy: "स्वास्थ्य चौकी",
-  // },
-];
 
 // ─────────────────────────────────────────────
 // Utility: build page number array with ellipsis
@@ -67,24 +40,19 @@ function SearchIcon() {
   );
 }
 
-function ActionButtons({ row, onEdit, onView }) {
+function ActionButtons({ row, onDelete, onView, onPrint }) {
   return (
     <div style={s.actionCell}>
-      <button
-        style={s.btnEdit}
-        title="सम्पादन गर्नुहोस्"
-        onClick={() => onEdit && onEdit(row)}
-        aria-label="Edit"
-      >
-        ✏️
+      <button style={s.btnPrint} onClick={() => onPrint(row)} type="button">
+        Print
       </button>
-      <button
-        style={s.btnView}
-        title="हेर्नुहोस्"
-        onClick={() => onView && onView(row)}
-        aria-label="View"
-      >
-        👁️
+
+      <button style={s.btnView} onClick={() => onView(row)} type="button">
+        View
+      </button>
+
+      <button style={s.btnDelete} onClick={() => onDelete(row)} type="button">
+        Delete
       </button>
     </div>
   );
@@ -95,20 +63,36 @@ function TableHeader() {
     <thead>
       {/* Row 1 */}
       <tr>
-        <th style={{ ...s.th, ...s.thSticky }} rowSpan={2}>कार्य</th>
-        <th style={s.th} rowSpan={2}>क्र.सं.</th>
-        <th style={s.th} rowSpan={2}>मुल दर्ता नम्बर</th>
+        <th style={s.th} rowSpan={2}>
+          क्र.सं.
+        </th>
+        <th style={s.th} rowSpan={2}>
+          मुल दर्ता नम्बर
+        </th>
         <th style={s.th} rowSpan={1}>
           <div style={s.thTop}>सेवा दर्ता नम्बर</div>
         </th>
-        <th style={s.th} rowSpan={2}>सेवाग्राहीको पुरा नाम</th>
-        <th style={s.th} rowSpan={2}>जाती</th>
-        <th style={s.th} rowSpan={2}>उमेर</th>
-        <th style={s.th} rowSpan={2}>लिङ्ग</th>
+        <th style={s.th} rowSpan={2}>
+          सेवाग्राहीको पुरा नाम
+        </th>
+        <th style={s.th} rowSpan={2}>
+          जाती
+        </th>
+        <th style={s.th} rowSpan={2}>
+          उमेर
+        </th>
+        <th style={s.th} rowSpan={2}>
+          लिङ्ग
+        </th>
         {/* ठेगाना spans 2 sub-columns */}
-        <th style={{ ...s.th, ...s.thGroup }} colSpan={2}>ठेगाना</th>
+        <th style={{ ...s.th, ...s.thGroup }} colSpan={2}>
+          ठेगाना
+        </th>
         <th style={s.th} rowSpan={1}>
           <div style={s.thTop}>सम्पर्क नम्बर</div>
+        </th>
+        <th style={{ ...s.th, ...s.thSticky }} rowSpan={2}>
+          कार्य
         </th>
       </tr>
       {/* Row 2 */}
@@ -136,33 +120,55 @@ function TableHeader() {
   );
 }
 
-function TableRow({ row, index }) {
+function TableRow({ row, index, onDelete, onView, onPrint }) {
   return (
     <tr style={index % 2 === 0 ? s.trEven : s.trOdd}>
-      <td style={{ ...s.td, ...s.tdSticky }}>
-        <ActionButtons row={row} />
-      </td>
       <td style={s.td}>{row.sn}</td>
-      <td style={s.td}>{row.mulDartaNumber}</td>
+
+      <td style={s.td}>{row.mool_darta}</td>
+
       <td style={s.td}>
-        <div>{row.sewaDartaNumber}</div>
-        <div style={s.subText}>{row.sewaDartaDate}</div>
+        <div>{row.service_number}</div>
+        <div style={s.subText}>{row.miti}</div>
       </td>
-      <td style={{ ...s.td, ...s.tdName }}>{row.fullName}</td>
-      <td style={s.td}>{row.caste}</td>
-      <td style={s.td}>{row.age}</td>
-      <td style={s.td}>{row.gender}</td>
-      <td style={s.td}>
-        <div>{row.district}</div>
-        <div style={s.subText}>{row.wardNumber}</div>
+
+      <td
+        style={{
+          ...s.td,
+          ...s.tdName,
+        }}
+      >
+        {row.full_name}
       </td>
+
+      <td style={s.td}>{row.jaati}</td>
+
+      <td style={s.td}>{row.umer}</td>
+
+      <td style={s.td}>{row.linga}</td>
+
       <td style={s.td}>
-        <div>{row.municipality}</div>
+        <div>{row.jilla}</div>
+        <div style={s.subText}>{row.wada}</div>
+      </td>
+
+      <td style={s.td}>
+        <div>-</div>
         <div style={s.subText}>{row.tol}</div>
       </td>
+
       <td style={s.td}>
-        <div>{row.contact}</div>
-        <div style={s.subText}>{row.referredBy}</div>
+        <div>{row.sampark_num}</div>
+        <div style={s.subText}>-</div>
+      </td>
+
+      <td style={{ ...s.td, ...s.tdSticky }}>
+        <ActionButtons
+          row={row}
+          onDelete={onDelete}
+          onView={onView}
+          onPrint={onPrint}
+        />
       </td>
     </tr>
   );
@@ -171,26 +177,131 @@ function TableRow({ row, index }) {
 // ─────────────────────────────────────────────
 // Main Component
 // ─────────────────────────────────────────────
-export default function JesthaNagarikSeva() {
+export default function JesthaNagarikRegisterDailyList() {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchMul, setSearchMul] = useState("");
-  const [searchDate, setSearchDate] = useState("18/01/2083");
-  // `data` would normally come from an API call / prop.
-  // Replace SAMPLE_DATA with your fetched state.
-  const [data] = useState(SAMPLE_DATA);
-  const [loading] = useState(false); // set true while fetching
+  const [searchDate, setSearchDate] = useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [details, setDetails] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const res = await axios.get(
+        "http://localhost:5000/api/ayurveda/jestha-nagarik",
+      );
+
+      setData(res.data || []);
+    } catch (error) {
+      alert("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleDelete = async (row) => {
+    const ok = window.confirm("Delete this record?");
+
+    if (!ok) return;
+
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/ayurveda/jestha-nagarik/${row.id}`,
+      );
+
+      fetchData();
+    } catch (error) {
+      alert("Delete failed");
+    }
+  };
+
+  const handleView = async (row) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/ayurveda/jestha-nagarik/${row.id}/items`,
+      );
+
+      setDetails(res.data || []);
+      setShowModal(true);
+    } catch (error) {
+      alert("Failed to load details");
+    }
+  };
+
+  const handlePrint = (row) => {
+    const w = window.open("", "_blank");
+
+    w.document.write(`
+    <html>
+      <head>
+        <title>Print</title>
+        <style>
+          body{font-family:Arial;padding:25px}
+          table{
+            width:100%;
+            border-collapse:collapse;
+          }
+          td,th{
+            border:1px solid #ccc;
+            padding:8px;
+          }
+        </style>
+      </head>
+      <body>
+        <h2>Jestha Nagarik Record</h2>
+        <table>
+          <tr>
+            <th>Service No</th>
+            <td>${row.service_number}</td>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <td>${row.full_name}</td>
+          </tr>
+          <tr>
+            <th>Date</th>
+            <td>${row.miti}</td>
+          </tr>
+          <tr>
+            <th>Contact</th>
+            <td>${row.sampark_num}</td>
+          </tr>
+        </table>
+
+        <script>
+          window.onload=function(){
+            window.print();
+            window.onafterprint=()=>window.close();
+          }
+        </script>
+      </body>
+    </html>
+  `);
+
+    w.document.close();
+  };
 
   // ── Client-side filtering (replace with server-side if data is large) ──
   const filtered = useMemo(() => {
     return data.filter((row) => {
       const mulMatch = searchMul.trim()
-        ? row.mulDartaNumber?.toLowerCase().includes(searchMul.trim().toLowerCase())
+        ? String(row.mool_darta || "")
+            .toLowerCase()
+            .includes(searchMul.toLowerCase())
         : true;
+
       const dateMatch = searchDate.trim()
-        ? row.sewaDartaDate?.includes(searchDate.trim()) ||
-          row.mulDartaDate?.includes(searchDate.trim())
+        ? String(row.miti || "").includes(searchDate.trim())
         : true;
+
       return mulMatch && dateMatch;
     });
   }, [data, searchMul, searchDate]);
@@ -233,8 +344,12 @@ export default function JesthaNagarikSeva() {
       <header style={s.pageHeader}>
         <h1 style={s.pageTitle}>जेष्ठ नागरिक सेवा दैनिक सूची</h1>
         <nav aria-label="breadcrumb" style={s.breadcrumb}>
-          <a href="#" style={s.breadcrumbLink}>गृहपृष्ठ</a>
-          <span style={s.breadcrumbSep} aria-hidden="true">/</span>
+          <a href="#" style={s.breadcrumbLink}>
+            गृहपृष्ठ
+          </a>
+          <span style={s.breadcrumbSep} aria-hidden="true">
+            /
+          </span>
           <span style={s.breadcrumbCurrent}>जेष्ठ नागरिक सेवा दैनिक सूची</span>
         </nav>
       </header>
@@ -245,7 +360,9 @@ export default function JesthaNagarikSeva() {
         <div style={s.controls}>
           {/* Left: Show N entries */}
           <div style={s.showEntries}>
-            <label htmlFor="pageSizeSelect" style={s.controlLabel}>Show</label>
+            <label htmlFor="pageSizeSelect" style={s.controlLabel}>
+              Show
+            </label>
             <select
               id="pageSizeSelect"
               style={s.select}
@@ -253,7 +370,9 @@ export default function JesthaNagarikSeva() {
               onChange={handlePageSizeChange}
             >
               {PAGE_SIZE_OPTIONS.map((n) => (
-                <option key={n} value={n}>{n}</option>
+                <option key={n} value={n}>
+                  {n}
+                </option>
               ))}
             </select>
             <span style={s.controlLabel}>entries</span>
@@ -281,7 +400,7 @@ export default function JesthaNagarikSeva() {
               style={s.searchBtn}
               title="खोज्नुहोस्"
               aria-label="खोज्नुहोस्"
-              onClick={() => setCurrentPage(1)}
+              onClick={fetchData}
             >
               <SearchIcon />
             </button>
@@ -289,7 +408,11 @@ export default function JesthaNagarikSeva() {
         </div>
 
         {/* Table */}
-        <div style={s.tableWrapper} role="region" aria-label="जेष्ठ नागरिक सेवा सूची">
+        <div
+          style={s.tableWrapper}
+          role="region"
+          aria-label="जेष्ठ नागरिक सेवा सूची"
+        >
           <table style={s.table} aria-live="polite">
             <TableHeader />
             <tbody>
@@ -307,7 +430,14 @@ export default function JesthaNagarikSeva() {
                 </tr>
               ) : (
                 paged.map((row, i) => (
-                  <TableRow key={row.id ?? i} row={row} index={i} />
+                  <TableRow
+                    key={row.id ?? i}
+                    row={row}
+                    index={i}
+                    onDelete={handleDelete}
+                    onView={handleView}
+                    onPrint={handlePrint}
+                  />
                 ))
               )}
             </tbody>
@@ -337,7 +467,9 @@ export default function JesthaNagarikSeva() {
 
             {pageRange.map((p, i) =>
               p === "..." ? (
-                <span key={`ellipsis-${i}`} style={s.ellipsis}>…</span>
+                <span key={`ellipsis-${i}`} style={s.ellipsis}>
+                  …
+                </span>
               ) : (
                 <button
                   key={p}
@@ -350,7 +482,7 @@ export default function JesthaNagarikSeva() {
                 >
                   {p}
                 </button>
-              )
+              ),
             )}
 
             <button
@@ -365,6 +497,66 @@ export default function JesthaNagarikSeva() {
             </button>
           </div>
         </div>
+        {showModal && (
+          <div
+            onClick={() => setShowModal(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,.45)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 999,
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "#fff",
+                width: "700px",
+                maxHeight: "80vh",
+                overflow: "auto",
+                padding: "20px",
+                borderRadius: "8px",
+              }}
+            >
+              <h3>फलोअप विवरण</h3>
+
+              {details.length === 0 ? (
+                <p>No data</p>
+              ) : (
+                details.map((item, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      borderBottom: "1px solid #ddd",
+                      padding: "10px 0",
+                    }}
+                  >
+                    <strong>{item.panel_type}</strong>
+
+                    <div>मिति: {item.miti}</div>
+                    <div>BMI: {item.bmi}</div>
+                    <div>HB: {item.hb}</div>
+                    <div>ESR: {item.esr}</div>
+                    <div>निन्द्रा: {item.nindra}</div>
+                    <div>कैफियत: {item.kaifiyat}</div>
+                  </div>
+                ))
+              )}
+
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  marginTop: "15px",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
@@ -498,7 +690,7 @@ const s = {
   },
   thSticky: {
     position: "sticky",
-    left: 0,
+    right: 0,
     zIndex: 2,
     background: "#eef1f8",
   },
@@ -527,7 +719,7 @@ const s = {
   },
   tdSticky: {
     position: "sticky",
-    left: 0,
+    right: 0,
     background: "inherit",
     zIndex: 1,
   },
@@ -560,24 +752,40 @@ const s = {
     display: "flex",
     gap: "6px",
     justifyContent: "center",
+    flexWrap: "wrap",
   },
-  btnEdit: {
-    background: "none",
+
+  btnPrint: {
+    background: "#2563eb",
+    color: "#fff",
     border: "none",
+    padding: "4px 10px",
+    borderRadius: "4px",
     cursor: "pointer",
-    fontSize: "15px",
-    padding: "2px 3px",
-    borderRadius: "3px",
-    lineHeight: 1,
+    fontSize: "12px",
+    minWidth: "58px",
   },
+
   btnView: {
-    background: "none",
+    background: "#16a34a",
+    color: "#fff",
     border: "none",
+    padding: "4px 10px",
+    borderRadius: "4px",
     cursor: "pointer",
-    fontSize: "15px",
-    padding: "2px 3px",
-    borderRadius: "3px",
-    lineHeight: 1,
+    fontSize: "12px",
+    minWidth: "58px",
+  },
+
+  btnDelete: {
+    background: "#dc2626",
+    color: "#fff",
+    border: "none",
+    padding: "4px 10px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "12px",
+    minWidth: "58px",
   },
 
   /* Divider */

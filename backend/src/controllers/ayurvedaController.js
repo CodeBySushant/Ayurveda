@@ -1,4 +1,5 @@
 const akupancharServiceModel = require("../models/akupancharServiceModel");
+const jesthaNagarikModel = require("../models/jesthaNagarikModel");
 
 /* Create */
 const createAkupancharService = (req, res) => {
@@ -61,9 +62,94 @@ const getAkupancharItems = (req, res) => {
   });
 };
 
+/* Create Jestha Nagarik */
+const createJesthaNagarik = (req, res) => {
+  const { panels = {}, ...headerData } = req.body;
+
+  jesthaNagarikModel.createJesthaNagarik(
+    headerData,
+    panels,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message:
+            "Failed to save record",
+          error: err
+        });
+      }
+
+      res.status(201).json(result);
+    }
+  );
+};
+
+/* Get All */
+const getJesthaNagarik = (req, res) => {
+  jesthaNagarikModel.getAllJesthaNagarik(
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message:
+            "Failed to fetch data"
+        });
+      }
+
+      res.json(result);
+    }
+  );
+};
+
+/* Delete */
+const deleteJesthaNagarik = (
+  req,
+  res
+) => {
+  jesthaNagarikModel.deleteJesthaNagarik(
+    req.params.id,
+    (err) => {
+      if (err) {
+        return res.status(500).json({
+          message:
+            "Delete failed"
+        });
+      }
+
+      res.json({
+        message:
+          "Deleted successfully"
+      });
+    }
+  );
+};
+
+/* Panels */
+const getJesthaPanels = (
+  req,
+  res
+) => {
+  jesthaNagarikModel.getJesthaPanels(
+    req.params.id,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message:
+            "Failed to fetch details"
+        });
+      }
+
+      res.json(result);
+    }
+  );
+};
+
 module.exports = {
   createAkupancharService,
   getAkupancharServices,
   deleteAkupancharService,
   getAkupancharItems,
+
+  createJesthaNagarik,
+  getJesthaNagarik,
+  deleteJesthaNagarik,
+  getJesthaPanels
 };
