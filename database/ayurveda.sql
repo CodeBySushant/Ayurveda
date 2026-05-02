@@ -447,3 +447,116 @@ CREATE TABLE akupanchar_service_items (
   REFERENCES akupanchar_services(id)
   ON DELETE CASCADE
 );
+
+CREATE TABLE jestha_nagarik_register (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  service_number VARCHAR(30) UNIQUE,
+
+  miti VARCHAR(20),
+  mool_darta VARCHAR(50),
+
+  raktachap VARCHAR(50),
+  taul VARCHAR(50),
+  fbs VARCHAR(50),
+
+  prakriti VARCHAR(100),
+  rog VARCHAR(150),
+  parikshan VARCHAR(255),
+
+  naam VARCHAR(120),
+  thar VARCHAR(120),
+  full_name VARCHAR(255),
+
+  umer VARCHAR(30),
+  linga VARCHAR(30),
+
+  sampark_num VARCHAR(30),
+  jaati VARCHAR(100),
+
+  wada VARCHAR(30),
+  tol VARCHAR(120),
+  jilla VARCHAR(120),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE jestha_nagarik_followups (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  register_id INT,
+
+  panel_type VARCHAR(20),
+  panel_title VARCHAR(50),
+
+  miti VARCHAR(20),
+
+  ashwagandha VARCHAR(50),
+  amalaki VARCHAR(50),
+  mahanarayan VARCHAR(50),
+
+  taul VARCHAR(50),
+  ubchad_val VARCHAR(50),
+  ubchad_unit VARCHAR(20),
+
+  bmi VARCHAR(50),
+  hb VARCHAR(50),
+  esr VARCHAR(50),
+  nindra VARCHAR(50),
+
+  bmi_sudhar VARCHAR(20),
+  bmi_sthir VARCHAR(20),
+  bmi_hras VARCHAR(20),
+
+  hb_sudhar VARCHAR(20),
+  hb_sthir VARCHAR(20),
+  hb_hras VARCHAR(20),
+
+  esr_sudhar VARCHAR(20),
+  esr_sthir VARCHAR(20),
+  esr_hras VARCHAR(20),
+
+  nindra_sudhar VARCHAR(20),
+  nindra_sthir VARCHAR(20),
+  nindra_hras VARCHAR(20),
+
+  parikshan TEXT,
+  kaifiyat TEXT,
+
+  FOREIGN KEY (register_id)
+  REFERENCES jestha_nagarik_register(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE ksharsutra_service_register (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  service_number VARCHAR(30) UNIQUE,
+
+  miti VARCHAR(20),
+  mool_darta VARCHAR(50),
+
+  raktachap VARCHAR(50),
+  taul VARCHAR(50),
+  fbs VARCHAR(50),
+
+  prakriti VARCHAR(100),
+  rog VARCHAR(150),
+  parikshan VARCHAR(255),
+
+  naam VARCHAR(120),
+  thar VARCHAR(120),
+  full_name VARCHAR(255),
+
+  umer VARCHAR(30),
+  linga VARCHAR(30),
+
+  sampark_num VARCHAR(30),
+  jaati VARCHAR(100),
+
+  wada VARCHAR(30),
+  tol VARCHAR(120),
+  jilla VARCHAR(120),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

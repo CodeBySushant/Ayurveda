@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 
 const COLUMNS = [
   { key: "sn", label: "क्र.सं." },
@@ -22,30 +23,117 @@ const COLUMNS = [
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
-export default function KsharshutraSeva() {
+export default function KsharsutraServiceIndex() {
   const [entries, setEntries] = useState(10);
-  const [searchDate, setSearchDate] = useState("18/01/2083");
+  const [searchDate, setSearchDate] = useState("");
   const [searchMul, setSearchMul] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Dummy data — replace with real API data
-  const data = [];
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const res = await axios.get(
+        "http://localhost:5000/api/ayurveda/ksharsutra-service",
+      );
+
+      setData(res.data || []);
+    } catch (error) {
+      alert("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleDelete = async (id) => {
+    const ok = window.confirm("Delete this record?");
+
+    if (!ok) return;
+
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/ayurveda/ksharsutra-service/${id}`,
+      );
+
+      fetchData();
+    } catch (error) {
+      alert("Delete failed");
+    }
+  };
+
+  const handlePrint = (row) => {
+    const w = window.open("", "_blank");
+
+    w.document.write(`
+    <html>
+    <head>
+      <title>Print</title>
+      <style>
+        body{
+          font-family:Arial;
+          padding:25px;
+        }
+        table{
+          width:100%;
+          border-collapse:collapse;
+        }
+        td,th{
+          border:1px solid #ccc;
+          padding:8px;
+        }
+      </style>
+    </head>
+    <body>
+      <h2>Ksharsutra Record</h2>
+
+      <table>
+        <tr><th>Service No</th><td>${row.service_number}</td></tr>
+        <tr><th>Name</th><td>${row.full_name}</td></tr>
+        <tr><th>Date</th><td>${row.miti}</td></tr>
+        <tr><th>Contact</th><td>${row.sampark_num}</td></tr>
+      </table>
+
+      <script>
+        window.onload=function(){
+          window.print();
+          window.onafterprint=()=>window.close();
+        }
+      </script>
+    </body>
+    </html>
+  `);
+
+    w.document.close();
+  };
 
   const filtered = useMemo(() => {
-    if (!searchMul && !searchDate) return data;
     return data.filter((row) => {
-      const matchesMul = searchMul
-        ? row.mulDartaNumber?.includes(searchMul)
+      const mulMatch = searchMul.trim()
+        ? String(row.mool_darta || "")
+            .toLowerCase()
+            .includes(searchMul.toLowerCase())
         : true;
-      const matchesDate = searchDate
-        ? row.mulDartaDate?.includes(searchDate)
+
+      const dateMatch = searchDate.trim()
+        ? String(row.miti || "").includes(searchDate.trim())
         : true;
-      return matchesMul && matchesDate;
+
+      return mulMatch && dateMatch;
     });
   }, [data, searchMul, searchDate]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / entries));
-  const paged = filtered.slice((currentPage - 1) * entries, currentPage * entries);
+  const paged = filtered.slice(
+    (currentPage - 1) * entries,
+    currentPage * entries,
+  );
 
   return (
     <div style={styles.page}>
@@ -53,9 +141,13 @@ export default function KsharshutraSeva() {
       <div style={styles.pageHeader}>
         <span style={styles.pageTitle}>क्षारसुत्र सेवा दैनिक सूची</span>
         <nav style={styles.breadcrumb}>
-          <a href="#" style={styles.breadcrumbLink}>गृहपृष्ठ</a>
+          <a href="#" style={styles.breadcrumbLink}>
+            गृहपृष्ठ
+          </a>
           <span style={styles.breadcrumbSep}>/</span>
-          <span style={styles.breadcrumbCurrent}>क्षारसुत्र सेवा दैनिक सूची</span>
+          <span style={styles.breadcrumbCurrent}>
+            क्षारसुत्र सेवा दैनिक सूची
+          </span>
         </nav>
       </div>
 
@@ -74,7 +166,9 @@ export default function KsharshutraSeva() {
               }}
             >
               {PAGE_SIZE_OPTIONS.map((n) => (
-                <option key={n} value={n}>{n}</option>
+                <option key={n} value={n}>
+                  {n}
+                </option>
               ))}
             </select>
             <span style={styles.controlLabel}>entries</span>
@@ -85,16 +179,36 @@ export default function KsharshutraSeva() {
               style={styles.searchInput}
               placeholder="मूल दर्ता नम्बर"
               value={searchMul}
-              onChange={(e) => { setSearchMul(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => {
+                setSearchMul(e.target.value);
+                setCurrentPage(1);
+              }}
             />
             <input
               style={styles.searchInput}
               placeholder="मिति (DD/MM/YYYY)"
               value={searchDate}
-              onChange={(e) => { setSearchDate(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => {
+                setSearchDate(e.target.value);
+                setCurrentPage(1);
+              }}
             />
-            <button style={styles.searchBtn} title="खोज्नुहोस्">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <button
+              style={styles.searchBtn}
+              onClick={fetchData}
+              type="button"
+              title="खोज्नुहोस्"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
@@ -108,19 +222,34 @@ export default function KsharshutraSeva() {
             <thead>
               <tr>
                 {COLUMNS.map((col) => (
-                  <th key={col.key} style={styles.th}>
+                  <th
+                    key={col.key}
+                    style={
+                      col.key === "action"
+                        ? {
+                            ...styles.th,
+                            ...styles.thSticky,
+                            minWidth: "180px",
+                          }
+                        : styles.th
+                    }
+                  >
                     <div style={styles.thInner}>
                       <span>{col.label}</span>
-                      {col.sub && (
-                        <span style={styles.thSub}>{col.sub}</span>
-                      )}
+                      {col.sub && <span style={styles.thSub}>{col.sub}</span>}
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {paged.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={COLUMNS.length} style={styles.noData}>
+                    Loading...
+                  </td>
+                </tr>
+              ) : paged.length === 0 ? (
                 <tr>
                   <td colSpan={COLUMNS.length} style={styles.noData}>
                     No data available in table
@@ -128,41 +257,77 @@ export default function KsharshutraSeva() {
                 </tr>
               ) : (
                 paged.map((row, i) => (
-                  <tr key={i} style={(currentPage - 1) * entries + i % 2 === 0 ? styles.trEven : styles.trOdd}>
-                    <td style={styles.td}>{(currentPage - 1) * entries + i + 1}</td>
+                  <tr
+                    key={row.id}
+                    style={i % 2 === 0 ? styles.trEven : styles.trOdd}
+                  >
                     <td style={styles.td}>
-                      <div>{row.mulDartaNumber}</div>
-                      <div style={styles.subText}>{row.mulDartaDate}</div>
+                      {(currentPage - 1) * entries + i + 1}
                     </td>
+
                     <td style={styles.td}>
-                      <div>{row.sewaDartaNumber}</div>
-                      <div style={styles.subText}>{row.sewaDartaDate}</div>
+                      <div>{row.mool_darta}</div>
+                      <div style={styles.subText}>{row.miti}</div>
                     </td>
-                    <td style={styles.td}>{row.fullName}</td>
+
                     <td style={styles.td}>
-                      <div>{row.age}</div>
-                      <div style={styles.subText}>{row.gender}</div>
+                      <div>{row.service_number}</div>
+                      <div style={styles.subText}>{row.miti}</div>
                     </td>
+
+                    <td style={styles.td}>{row.full_name}</td>
+
                     <td style={styles.td}>
-                      <div>{row.district}</div>
-                      <div style={styles.subText}>{row.address}</div>
+                      <div>{row.umer}</div>
+                      <div style={styles.subText}>{row.linga}</div>
                     </td>
+
                     <td style={styles.td}>
-                      <div>{row.contact}</div>
-                      <div style={styles.subText}>{row.referredBy}</div>
+                      <div>{row.jilla}</div>
+                      <div style={styles.subText}>
+                        वडा {row.wada}, {row.tol}
+                      </div>
                     </td>
+
                     <td style={styles.td}>
-                      <span style={{
-                        ...styles.badge,
-                        ...(row.status === "सक्रिय" ? styles.badgeActive : styles.badgeInactive)
-                      }}>
-                        {row.status}
+                      <div>{row.sampark_num}</div>
+                      <div style={styles.subText}>-</div>
+                    </td>
+
+                    <td style={styles.td}>
+                      <span
+                        style={{
+                          ...styles.badge,
+                          ...styles.badgeActive,
+                        }}
+                      >
+                        सक्रिय
                       </span>
                     </td>
-                    <td style={styles.td}>
-                      <div style={styles.actionBtns}>
-                        <button style={styles.actionBtnEdit} title="सम्पादन">✏️</button>
-                        <button style={styles.actionBtnView} title="हेर्नुहोस्">👁️</button>
+
+                    <td
+                      style={{
+                        ...styles.td,
+                        ...styles.tdSticky,
+                        minWidth: "180px",
+                      }}
+                    >
+                      <div style={styles.actionWrap}>
+                        <button
+                          type="button"
+                          style={styles.btnPrint}
+                          onClick={() => handlePrint(row)}
+                        >
+                          Print
+                        </button>
+
+                        <button
+                          type="button"
+                          style={styles.btnDelete}
+                          onClick={() => handleDelete(row.id)}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -181,14 +346,20 @@ export default function KsharshutraSeva() {
           </span>
           <div style={styles.pageButtons}>
             <button
-              style={{ ...styles.pageBtn, ...(currentPage === 1 ? styles.pageBtnDisabled : {}) }}
+              style={{
+                ...styles.pageBtn,
+                ...(currentPage === 1 ? styles.pageBtnDisabled : {}),
+              }}
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             >
               Previous
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+              .filter(
+                (p) =>
+                  p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1,
+              )
               .reduce((acc, p, idx, arr) => {
                 if (idx > 0 && p - arr[idx - 1] > 1) acc.push("...");
                 acc.push(p);
@@ -196,19 +367,27 @@ export default function KsharshutraSeva() {
               }, [])
               .map((p, i) =>
                 p === "..." ? (
-                  <span key={`ellipsis-${i}`} style={styles.ellipsis}>…</span>
+                  <span key={`ellipsis-${i}`} style={styles.ellipsis}>
+                    …
+                  </span>
                 ) : (
                   <button
                     key={p}
-                    style={{ ...styles.pageBtn, ...(p === currentPage ? styles.pageBtnActive : {}) }}
+                    style={{
+                      ...styles.pageBtn,
+                      ...(p === currentPage ? styles.pageBtnActive : {}),
+                    }}
                     onClick={() => setCurrentPage(p)}
                   >
                     {p}
                   </button>
-                )
+                ),
               )}
             <button
-              style={{ ...styles.pageBtn, ...(currentPage === totalPages ? styles.pageBtnDisabled : {}) }}
+              style={{
+                ...styles.pageBtn,
+                ...(currentPage === totalPages ? styles.pageBtnDisabled : {}),
+              }}
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             >
@@ -389,27 +568,6 @@ const styles = {
     background: "#fed7d7",
     color: "#9b2c2c",
   },
-  actionBtns: {
-    display: "flex",
-    gap: "6px",
-    justifyContent: "center",
-  },
-  actionBtnEdit: {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "15px",
-    padding: "2px 4px",
-    borderRadius: "4px",
-  },
-  actionBtnView: {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "15px",
-    padding: "2px 4px",
-    borderRadius: "4px",
-  },
   pagination: {
     display: "flex",
     justifyContent: "space-between",
@@ -453,5 +611,45 @@ const styles = {
     padding: "5px 4px",
     color: "#a0aec0",
     fontSize: "13px",
+  },
+  thSticky: {
+    position: "sticky",
+    right: 0,
+    zIndex: 3,
+    background: "#eef1f8",
+  },
+
+  tdSticky: {
+    position: "sticky",
+    right: 0,
+    zIndex: 2,
+    background: "#fff",
+  },
+
+  actionWrap: {
+    display: "flex",
+    gap: "6px",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
+
+  btnPrint: {
+    background: "#2563eb",
+    color: "#fff",
+    border: "none",
+    padding: "4px 10px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "12px",
+  },
+
+  btnDelete: {
+    background: "#dc2626",
+    color: "#fff",
+    border: "none",
+    padding: "4px 10px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "12px",
   },
 };

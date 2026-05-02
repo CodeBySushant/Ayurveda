@@ -11,6 +11,10 @@ const {
   getJesthaNagarik,
   deleteJesthaNagarik,
   getJesthaPanels,
+
+  createKsharsutraService,
+  getKsharsutraServices,
+  deleteKsharsutraService,
 } = require("../controllers/ayurvedaController");
 
 /* Akupanchar Routes */
@@ -32,5 +36,13 @@ router.get("/jestha-nagarik", getJesthaNagarik);
 router.delete("/jestha-nagarik/:id", deleteJesthaNagarik);
 
 router.get("/jestha-nagarik/:id/items", getJesthaPanels);
+
+/* Ksharsutra Routes */
+
+router.post("/ksharsutra-service", createKsharsutraService);
+
+router.get("/ksharsutra-service", getKsharsutraServices);
+
+router.delete("/ksharsutra-service/:id", deleteKsharsutraService);
 
 module.exports = router;
