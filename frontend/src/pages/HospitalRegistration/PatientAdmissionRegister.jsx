@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap');
@@ -229,18 +230,48 @@ const styles = `
   }
 `;
 
-const JAATI_OPTIONS = ["ब्राह्मण/क्षेत्री", "जनजाति", "दलित", "मधेसी", "मुस्लिम", "अन्य"];
+const JAATI_OPTIONS = [
+  "ब्राह्मण/क्षेत्री",
+  "जनजाति",
+  "दलित",
+  "मधेसी",
+  "मुस्लिम",
+  "अन्य",
+];
 const LINGA_OPTIONS = ["पुरुष", "महिला", "अन्य"];
-const PRADESH_OPTIONS = ["कोशी प्रदेश", "मधेश प्रदेश", "बागमती प्रदेश", "गण्डकी प्रदेश", "लुम्बिनी प्रदेश", "कर्णाली प्रदेश", "सुदूरपश्चिम प्रदेश"];
+const PRADESH_OPTIONS = [
+  "कोशी प्रदेश",
+  "मधेश प्रदेश",
+  "बागमती प्रदेश",
+  "गण्डकी प्रदेश",
+  "लुम्बिनी प्रदेश",
+  "कर्णाली प्रदेश",
+  "सुदूरपश्चिम प्रदेश",
+];
 const SOURCE_OPTIONS = ["OPD", "Emergency", "Referral", "Self", "Other"];
-const INPATIENT_OPTIONS = ["Ward A", "Ward B", "Ward C", "ICU", "Maternity", "Pediatric"];
+const INPATIENT_OPTIONS = [
+  "Ward A",
+  "Ward B",
+  "Ward C",
+  "ICU",
+  "Maternity",
+  "Pediatric",
+];
 
-const emptyMedRow = () => ({ id: Date.now() + Math.random(), aushadhi: "", matra: "" });
-const emptyInvRow = () => ({ id: Date.now() + Math.random(), prakar: "", vivaran: "" });
+const emptyMedRow = () => ({
+  id: Date.now() + Math.random(),
+  aushadhi: "",
+  matra: "",
+});
+const emptyInvRow = () => ({
+  id: Date.now() + Math.random(),
+  prakar: "",
+  vivaran: "",
+});
 
 export default function PatientAdmissionRegister() {
   const [formData, setFormData] = useState({
-    miti: "18/01/2083",
+    miti: new Date().toLocaleDateString("en-GB"),
     mulDarta: "",
     isFirstTime: false,
     policeCase: false,
@@ -271,15 +302,19 @@ export default function PatientAdmissionRegister() {
 
   const [medRows, setMedRows] = useState([emptyMedRow()]);
   const [invRows, setInvRows] = useState([emptyInvRow()]);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (field) => (e) => {
-    const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    const val =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setFormData((prev) => ({ ...prev, [field]: val }));
   };
 
   // Medicine rows
   const handleMedChange = (id, field) => (e) =>
-    setMedRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: e.target.value } : r)));
+    setMedRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, [field]: e.target.value } : r)),
+    );
   const addMedRow = () => setMedRows((prev) => [...prev, emptyMedRow()]);
   const removeMedRow = (id) => {
     if (medRows.length === 1) return;
@@ -288,17 +323,83 @@ export default function PatientAdmissionRegister() {
 
   // Investigation rows
   const handleInvChange = (id, field) => (e) =>
-    setInvRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: e.target.value } : r)));
+    setInvRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, [field]: e.target.value } : r)),
+    );
   const addInvRow = () => setInvRows((prev) => [...prev, emptyInvRow()]);
   const removeInvRow = (id) => {
     if (invRows.length === 1) return;
     setInvRows((prev) => prev.filter((r) => r.id !== id));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", { ...formData, medRows, invRows });
-    alert("Form submitted successfully!");
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        formDate: formData.miti,
+
+        masterNumber: formData.mulDarta,
+        isFirstTime: formData.isFirstTime,
+        policeCase: formData.policeCase,
+
+        inpatientNo: formData.inpatientNo,
+
+        guardianName: formData.guardianName,
+        guardianContact: formData.guardianContact,
+
+        admissionSource: formData.praveshKoSrot,
+        wardNumber: formData.wadaNumber,
+
+        provisionalDiagnosis: formData.asthaayiNidaan,
+
+        purbaKarma: formData.purbaKarmaUpakarma,
+        pradhanKarma: formData.pradhanKarma,
+        ksharsutra: formData.ksharsutra,
+        therapeutic: formData.therapeutic,
+        therapyOther: formData.therapyOther,
+
+        remarks: formData.remarks,
+
+        firstName: formData.naam,
+        lastName: formData.thar,
+        caste: formData.jaati,
+        gender: formData.linga,
+        age: formData.umer,
+        contactNumber: formData.samparkNumber,
+        province: formData.pradesh,
+        patientWard: formData.recipientWada,
+        locality: formData.tol,
+
+        medicines: medRows
+          .filter((x) => x.aushadhi.trim())
+          .map((x) => ({
+            medicineName: x.aushadhi,
+            dosage: x.matra,
+          })),
+
+        investigations: invRows
+          .filter((x) => x.prakar.trim())
+          .map((x) => ({
+            investigationType: x.prakar,
+            details: x.vivaran,
+          })),
+      };
+
+      const res = await axios.post(
+        "http://localhost:5000/api/hospital/patient-admission",
+        payload,
+      );
+
+      alert(`Saved Successfully\n${res.data.admissionNumber}`);
+    } catch (error) {
+      console.log(error);
+      alert("Save failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -314,7 +415,6 @@ export default function PatientAdmissionRegister() {
         </div>
 
         <form className="form-container" onSubmit={handleSubmit}>
-
           {/* Date */}
           <div className="date-section">
             <span className="date-label">मिति :</span>
@@ -328,7 +428,6 @@ export default function PatientAdmissionRegister() {
 
           {/* Main Two-Column Grid */}
           <div className="main-grid">
-
             {/* ── LEFT COLUMN ── */}
             <div>
               {/* Mul Darta */}
@@ -372,7 +471,9 @@ export default function PatientAdmissionRegister() {
                   >
                     <option value="">Inpatient नम्बर छनोट गर्नुहोस् *</option>
                     {INPATIENT_OPTIONS.map((o) => (
-                      <option key={o} value={o}>{o}</option>
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -410,7 +511,9 @@ export default function PatientAdmissionRegister() {
                     >
                       <option value="">Select Source</option>
                       {SOURCE_OPTIONS.map((o) => (
-                        <option key={o} value={o}>{o}</option>
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -467,13 +570,21 @@ export default function PatientAdmissionRegister() {
                           />
                         </td>
                         <td className="action-cell">
-                          <button type="button" className="btn-add" onClick={addMedRow}>+</button>
+                          <button
+                            type="button"
+                            className="btn-add"
+                            onClick={addMedRow}
+                          >
+                            +
+                          </button>
                           <button
                             type="button"
                             className="btn-remove"
                             onClick={() => removeMedRow(row.id)}
                             disabled={medRows.length === 1}
-                          >×</button>
+                          >
+                            ×
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -577,7 +688,9 @@ export default function PatientAdmissionRegister() {
                     >
                       <option value="">जाती छनोट गर्नुहोस् *</option>
                       {JAATI_OPTIONS.map((o) => (
-                        <option key={o} value={o}>{o}</option>
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -590,7 +703,9 @@ export default function PatientAdmissionRegister() {
                     >
                       <option value="">लिङ्ग छनोट गर्नुहोस् *</option>
                       {LINGA_OPTIONS.map((o) => (
-                        <option key={o} value={o}>{o}</option>
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -628,7 +743,9 @@ export default function PatientAdmissionRegister() {
                   >
                     <option value="">प्रदेश छनोट गर्नुहोस् *</option>
                     {PRADESH_OPTIONS.map((o) => (
-                      <option key={o} value={o}>{o}</option>
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -691,13 +808,21 @@ export default function PatientAdmissionRegister() {
                         />
                       </td>
                       <td className="action-cell">
-                        <button type="button" className="btn-add" onClick={addInvRow}>+</button>
+                        <button
+                          type="button"
+                          className="btn-add"
+                          onClick={addInvRow}
+                        >
+                          +
+                        </button>
                         <button
                           type="button"
                           className="btn-remove"
                           onClick={() => removeInvRow(row.id)}
                           disabled={invRows.length === 1}
-                        >×</button>
+                        >
+                          ×
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -708,9 +833,18 @@ export default function PatientAdmissionRegister() {
 
           {/* Submit */}
           <div className="submit-wrap">
-            <button type="submit" className="btn-submit">Submit</button>
+            <button
+              type="submit"
+              className="btn-submit"
+              disabled={loading}
+              style={{
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+            >
+              {loading ? "Saving..." : "Submit"}
+            </button>
           </div>
-
         </form>
       </div>
     </>

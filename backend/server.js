@@ -6,6 +6,7 @@ require("./src/config/db");
 
 const commonRoutes = require("./src/routes/commonRoutes");
 const authRoutes = require("./src/routes/authRoutes");
+const hospitalRoutes = require("./src/routes/hospitalRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 /* Routes */
 app.use("/api/common", commonRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/hospital", hospitalRoutes);
 
 app.get("/", (req, res) => {
   res.send("Ayurveda Backend Running ✅");

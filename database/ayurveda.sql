@@ -229,3 +229,69 @@ CREATE TABLE return_services (
   REFERENCES return_slips(id)
   ON DELETE CASCADE
 );
+
+CREATE TABLE patient_admissions (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  admission_number VARCHAR(30) UNIQUE,
+  form_date VARCHAR(20),
+
+  master_number VARCHAR(30),
+  is_first_time BOOLEAN DEFAULT FALSE,
+  police_case BOOLEAN DEFAULT FALSE,
+
+  inpatient_no VARCHAR(50),
+
+  guardian_name VARCHAR(120),
+  guardian_contact VARCHAR(30),
+
+  admission_source VARCHAR(80),
+  ward_number VARCHAR(20),
+
+  provisional_diagnosis TEXT,
+
+  therapy_purba_karma BOOLEAN DEFAULT FALSE,
+  therapy_pradhan_karma BOOLEAN DEFAULT FALSE,
+  therapy_ksharsutra BOOLEAN DEFAULT FALSE,
+  therapy_therapeutic BOOLEAN DEFAULT FALSE,
+  therapy_other VARCHAR(150),
+
+  remarks TEXT,
+
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  caste VARCHAR(80),
+  gender VARCHAR(30),
+  age VARCHAR(20),
+  contact_number VARCHAR(30),
+  province VARCHAR(80),
+  patient_ward VARCHAR(20),
+  locality VARCHAR(120),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE patient_admission_medicines (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  admission_id INT NOT NULL,
+
+  medicine_name VARCHAR(150),
+  dosage VARCHAR(100),
+
+  FOREIGN KEY (admission_id)
+  REFERENCES patient_admissions(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE patient_admission_investigations (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  admission_id INT NOT NULL,
+
+  investigation_type VARCHAR(150),
+  details VARCHAR(255),
+
+  FOREIGN KEY (admission_id)
+  REFERENCES patient_admissions(id)
+  ON DELETE CASCADE
+);
+
