@@ -1,4 +1,5 @@
 const patientAdmissionModel = require("../models/patientAdmissionModel");
+const emergencyServiceModel = require("../models/emergencyServiceModel");
 
 /* Create Patient Admission */
 const createPatientAdmission = (req, res) => {
@@ -65,9 +66,88 @@ const getPatientAdmissionItems = (req, res) => {
   );
 };
 
+/* Create Emergency Service */
+const createEmergencyService = (req, res) => {
+  const {
+    symptoms = [],
+    complaints = [],
+    investigations = [],
+    diagnosis = [],
+    treatments = [],
+    medicines = [],
+    ...headerData
+  } = req.body;
+
+  emergencyServiceModel.createEmergencyService(
+    headerData,
+    symptoms,
+    complaints,
+    investigations,
+    diagnosis,
+    treatments,
+    medicines,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Failed to save emergency service",
+          error: err,
+        });
+      }
+
+      res.status(201).json(result);
+    },
+  );
+};
+
+/* Get All */
+const getEmergencyServices = (req, res) => {
+  emergencyServiceModel.getAllEmergencyServices((err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Failed to fetch emergency services",
+      });
+    }
+
+    res.json(result);
+  });
+};
+
+/* Delete */
+const deleteEmergencyService = (req, res) => {
+  emergencyServiceModel.deleteEmergencyService(req.params.id, (err) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Delete failed",
+      });
+    }
+
+    res.json({
+      message: "Deleted successfully",
+    });
+  });
+};
+
+/* Items */
+const getEmergencyItems = (req, res) => {
+  emergencyServiceModel.getEmergencyItems(req.params.id, (err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Failed to fetch details",
+      });
+    }
+
+    res.json(result);
+  });
+};
+
 module.exports = {
   createPatientAdmission,
   getPatientAdmissions,
   deletePatientAdmission,
   getPatientAdmissionItems,
+
+  createEmergencyService,
+  getEmergencyServices,
+  deleteEmergencyService,
+  getEmergencyItems,
 };

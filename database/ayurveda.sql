@@ -295,3 +295,106 @@ CREATE TABLE patient_admission_investigations (
   ON DELETE CASCADE
 );
 
+CREATE TABLE emergency_services (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+
+  emergency_number VARCHAR(30) UNIQUE,
+
+  form_date VARCHAR(20),
+  registration_date VARCHAR(20),
+  registration_time VARCHAR(20),
+
+  first_name VARCHAR(100),
+  family_name VARCHAR(100),
+
+  caste VARCHAR(80),
+  gender VARCHAR(30),
+
+  age_group VARCHAR(80),
+  age VARCHAR(20),
+
+  district VARCHAR(100),
+  ward_number VARCHAR(20),
+  locality VARCHAR(120),
+
+  guardian_name VARCHAR(120),
+  guardian_contact VARCHAR(30),
+
+  self_admission BOOLEAN DEFAULT FALSE,
+  brought_dead BOOLEAN DEFAULT FALSE,
+
+  referring_org VARCHAR(150),
+
+  disease VARCHAR(150),
+
+  under_observation BOOLEAN DEFAULT FALSE,
+
+  discharge_date VARCHAR(20),
+  discharge_time VARCHAR(20),
+
+  outcome_status VARCHAR(80),
+  patient_death BOOLEAN DEFAULT FALSE,
+
+  cost_exemption VARCHAR(80),
+  total_cost_exemption VARCHAR(50),
+  exemption_group VARCHAR(80),
+
+  gender_violence BOOLEAN DEFAULT FALSE,
+  police_case BOOLEAN DEFAULT FALSE,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE emergency_symptoms (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  emergency_id INT,
+  item_name VARCHAR(255),
+  FOREIGN KEY (emergency_id)
+  REFERENCES emergency_services(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE emergency_complaints (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  emergency_id INT,
+  item_name VARCHAR(255),
+  FOREIGN KEY (emergency_id)
+  REFERENCES emergency_services(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE emergency_investigations (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  emergency_id INT,
+  item_name VARCHAR(255),
+  FOREIGN KEY (emergency_id)
+  REFERENCES emergency_services(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE emergency_diagnosis (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  emergency_id INT,
+  item_name VARCHAR(255),
+  FOREIGN KEY (emergency_id)
+  REFERENCES emergency_services(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE emergency_treatments (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  emergency_id INT,
+  item_name VARCHAR(255),
+  FOREIGN KEY (emergency_id)
+  REFERENCES emergency_services(id)
+  ON DELETE CASCADE
+);
+
+CREATE TABLE emergency_medicines (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  emergency_id INT,
+  item_name VARCHAR(255),
+  FOREIGN KEY (emergency_id)
+  REFERENCES emergency_services(id)
+  ON DELETE CASCADE
+);

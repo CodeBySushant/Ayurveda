@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap');
@@ -163,44 +164,94 @@ const styles = `
   }
 `;
 
-const CASTE_OPT = ["ब्राह्मण/क्षेत्री", "जनजाति", "दलित", "मधेसी", "मुस्लिम", "अन्य"];
+const CASTE_OPT = [
+  "ब्राह्मण/क्षेत्री",
+  "जनजाति",
+  "दलित",
+  "मधेसी",
+  "मुस्लिम",
+  "अन्य",
+];
 const GENDER_OPT = ["पुरुष", "महिला", "अन्य"];
-const AGE_GROUP_OPT = ["शिशु (0-1)", "बालबालिका (1-9)", "किशोर (10-19)", "युवा (20-39)", "मध्यम (40-59)", "वृद्ध (60+)"];
-const DISTRICT_OPT = ["काठमाडौं", "ललितपुर", "भक्तपुर", "पोखरा", "चितवन", "धनुषा", "मोरङ", "सुनसरी", "रुपन्देही", "बाँके"];
-const DISEASE_OPT = ["मधुमेह", "उच्च रक्तचाप", "श्वासप्रश्वास", "हृदय रोग", "मिर्गी", "आघात", "अन्य"];
+const AGE_GROUP_OPT = [
+  "शिशु (0-1)",
+  "बालबालिका (1-9)",
+  "किशोर (10-19)",
+  "युवा (20-39)",
+  "मध्यम (40-59)",
+  "वृद्ध (60+)",
+];
+const DISTRICT_OPT = [
+  "काठमाडौं",
+  "ललितपुर",
+  "भक्तपुर",
+  "पोखरा",
+  "चितवन",
+  "धनुषा",
+  "मोरङ",
+  "सुनसरी",
+  "रुपन्देही",
+  "बाँके",
+];
+const DISEASE_OPT = [
+  "मधुमेह",
+  "उच्च रक्तचाप",
+  "श्वासप्रश्वास",
+  "हृदय रोग",
+  "मिर्गी",
+  "आघात",
+  "अन्य",
+];
 const OUTCOME_OPT = ["Discharged", "Referred", "DAMA", "Expired", "Absconded"];
 const COST_EXEMPT_OPT = ["Full Exemption", "Partial Exemption", "No Exemption"];
-const COST_GROUP_OPT = ["Janajati", "Dalit", "Senior Citizen", "Disabled", "Poor"];
+const COST_GROUP_OPT = [
+  "Janajati",
+  "Dalit",
+  "Senior Citizen",
+  "Disabled",
+  "Poor",
+];
 
 const mkRow = (fields) => ({ id: Date.now() + Math.random(), ...fields });
 
 export default function EmergencyServiceRegister() {
   const [f, setF] = useState({
-    miti: "18/01/2083",
-    panjMiti: "18/01/2083",
-    panjSamay: "",
-    firstName: "", familyName: "",
-    jaati: "", linga: "",
-    umerSamuh: "", umer: "",
+    miti: new Date().toLocaleDateString("en-GB"),
+    panjMiti: new Date().toLocaleDateString("en-GB"),
+    panjSamay: new Date().toTimeString().slice(0, 5),
+    firstName: "",
+    familyName: "",
+    jaati: "",
+    linga: "",
+    umerSamuh: "",
+    umer: "",
     jilla: "",
-    wada: "", tol: "",
-    palakNaam: "", palakSamparka: "",
-    selfAdmission: false, broughtDead: false,
+    wada: "",
+    tol: "",
+    palakNaam: "",
+    palakSamparka: "",
+    selfAdmission: false,
+    broughtDead: false,
     referringOrg: "",
     avalokan: false,
-    disMiti: "", disSamay: "",
-    parinam: "", rogiMrityu: false,
-    lagatMukti: "", kulLagatMukti: "",
+    disMiti: "",
+    disSamay: "",
+    parinam: "",
+    rogiMrityu: false,
+    lagatMukti: "",
+    kulLagatMukti: "",
     lagatMuktiSamuh: "",
-    laiangikHinsa: false, pulisKes: false,
+    laiangikHinsa: false,
+    pulisKes: false,
   });
 
-  const [lakshan, setLakshan]       = useState([mkRow({ value: "" })]);
+  const [lakshan, setLakshan] = useState([mkRow({ value: "" })]);
   const [complaints, setComplaints] = useState([mkRow({ value: "" })]);
-  const [anweshan, setAnweshan]     = useState([mkRow({ value: "" })]);
-  const [nidaan, setNidaan]         = useState([mkRow({ value: "" })]);
-  const [upachar, setUpachar]       = useState([mkRow({ value: "" })]);
-  const [aushadhi, setAushadhi]     = useState([mkRow({ value: "" })]);
+  const [anweshan, setAnweshan] = useState([mkRow({ value: "" })]);
+  const [nidaan, setNidaan] = useState([mkRow({ value: "" })]);
+  const [upachar, setUpachar] = useState([mkRow({ value: "" })]);
+  const [aushadhi, setAushadhi] = useState([mkRow({ value: "" })]);
+  const [loading, setLoading] = useState(false);
 
   const hc = (k) => (e) => {
     const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
@@ -209,8 +260,10 @@ export default function EmergencyServiceRegister() {
 
   // generic dynamic-table helpers
   const rowChange = (setter) => (id) => (e) =>
-    setter((p) => p.map((r) => r.id === id ? { ...r, value: e.target.value } : r));
-  const rowAdd    = (setter) => () => setter((p) => [...p, mkRow({ value: "" })]);
+    setter((p) =>
+      p.map((r) => (r.id === id ? { ...r, value: e.target.value } : r)),
+    );
+  const rowAdd = (setter) => () => setter((p) => [...p, mkRow({ value: "" })]);
   const rowRemove = (setter, rows) => (id) => {
     if (rows.length === 1) return;
     setter((p) => p.filter((r) => r.id !== id));
@@ -232,14 +285,28 @@ export default function EmergencyServiceRegister() {
             <tr key={row.id}>
               <td className="sn">{i + 1}</td>
               <td>
-                <input className="inp" value={row.value}
-                  onChange={rowChange(setter)(row.id)} />
+                <input
+                  className="inp"
+                  value={row.value}
+                  onChange={rowChange(setter)(row.id)}
+                />
               </td>
               <td className="act">
-                <button type="button" className="btn-a" onClick={rowAdd(setter)}>+</button>
-                <button type="button" className="btn-r"
+                <button
+                  type="button"
+                  className="btn-a"
+                  onClick={rowAdd(setter)}
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  className="btn-r"
                   onClick={() => rowRemove(setter, rows)(row.id)}
-                  disabled={rows.length === 1}>×</button>
+                  disabled={rows.length === 1}
+                >
+                  ×
+                </button>
               </td>
             </tr>
           ))}
@@ -248,10 +315,148 @@ export default function EmergencyServiceRegister() {
     </>
   );
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ f, lakshan, complaints, anweshan, nidaan, upachar, aushadhi });
-    alert("बुझाइयो!");
+    if (!f.firstName.trim()) {
+      return alert("नाम आवश्यक छ");
+    }
+
+    if (!f.familyName.trim()) {
+      return alert("थर आवश्यक छ");
+    }
+
+    if (!f.linga) {
+      return alert("लिङ्ग छान्नुहोस्");
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        formDate: f.miti,
+        registrationDate: f.panjMiti,
+        registrationTime: f.panjSamay,
+
+        firstName: f.firstName,
+        familyName: f.familyName,
+
+        caste: f.jaati,
+        gender: f.linga,
+
+        ageGroup: f.umerSamuh,
+        age: f.umer,
+
+        district: f.jilla,
+        wardNumber: f.wada,
+        locality: f.tol,
+
+        guardianName: f.palakNaam,
+        guardianContact: f.palakSamparka,
+
+        selfAdmission: f.selfAdmission,
+        broughtDead: f.broughtDead,
+
+        referringOrg: f.referringOrg,
+
+        disease: f.rog,
+
+        underObservation: f.avalokan,
+
+        dischargeDate: f.disMiti,
+        dischargeTime: f.disSamay,
+
+        outcomeStatus: f.parinam,
+        patientDeath: f.rogiMrityu,
+
+        costExemption: f.lagatMukti,
+        totalCostExemption: f.kulLagatMukti,
+        exemptionGroup: f.lagatMuktiSamuh,
+
+        genderViolence: f.laiangikHinsa,
+        policeCase: f.pulisKes,
+
+        symptoms: lakshan
+          .filter((x) => x.value.trim())
+          .map((x) => ({ itemName: x.value })),
+
+        complaints: complaints
+          .filter((x) => x.value.trim())
+          .map((x) => ({ itemName: x.value })),
+
+        investigations: anweshan
+          .filter((x) => x.value.trim())
+          .map((x) => ({ itemName: x.value })),
+
+        diagnosis: nidaan
+          .filter((x) => x.value.trim())
+          .map((x) => ({ itemName: x.value })),
+
+        treatments: upachar
+          .filter((x) => x.value.trim())
+          .map((x) => ({ itemName: x.value })),
+
+        medicines: aushadhi
+          .filter((x) => x.value.trim())
+          .map((x) => ({ itemName: x.value })),
+      };
+
+      const res = await axios.post(
+        "http://localhost:5000/api/hospital/emergency-service",
+        payload,
+      );
+
+      alert(`Saved Successfully\n${res.data.emergencyNumber}`);
+
+      setF({
+        miti: new Date().toLocaleDateString("en-GB"),
+        panjMiti: new Date().toLocaleDateString("en-GB"),
+        panjSamay: new Date().toTimeString().slice(0, 5),
+
+        firstName: "",
+        familyName: "",
+        jaati: "",
+        linga: "",
+        umerSamuh: "",
+        umer: "",
+        jilla: "",
+        wada: "",
+        tol: "",
+        palakNaam: "",
+        palakSamparka: "",
+
+        selfAdmission: false,
+        broughtDead: false,
+
+        referringOrg: "",
+
+        rog: "",
+        avalokan: false,
+
+        disMiti: "",
+        disSamay: "",
+        parinam: "",
+        rogiMrityu: false,
+
+        lagatMukti: "",
+        kulLagatMukti: "",
+        lagatMuktiSamuh: "",
+
+        laiangikHinsa: false,
+        pulisKes: false,
+      });
+
+      setLakshan([mkRow({ value: "" })]);
+      setComplaints([mkRow({ value: "" })]);
+      setAnweshan([mkRow({ value: "" })]);
+      setNidaan([mkRow({ value: "" })]);
+      setUpachar([mkRow({ value: "" })]);
+      setAushadhi([mkRow({ value: "" })]);
+    } catch (error) {
+      console.log(error);
+      alert("Save failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -260,20 +465,25 @@ export default function EmergencyServiceRegister() {
       <div className="root">
         <div className="page-header">
           <h1>आपातकालीन सेवा दर्ता</h1>
-          <div className="breadcrumb">गृहपृष्ठ / <span>आपातकालीन सेवा दर्ता</span></div>
+          <div className="breadcrumb">
+            गृहपृष्ठ / <span>आपातकालीन सेवा दर्ता</span>
+          </div>
         </div>
 
         <form className="fc" onSubmit={handleSubmit}>
-
           {/* Top date */}
           <div className="top-date">
             <span>मिति :</span>
-            <input className="inp" style={{ maxWidth: 160 }} value={f.miti} onChange={hc("miti")} />
+            <input
+              className="inp"
+              style={{ maxWidth: 160 }}
+              value={f.miti}
+              onChange={hc("miti")}
+            />
           </div>
 
           {/* Main two panels */}
           <div className="two-panel">
-
             {/* ── LEFT: पेसेन्टको जानकारी ── */}
             <div className="panel">
               <div className="panel-title">पेसेन्टको जानकारी</div>
@@ -282,11 +492,20 @@ export default function EmergencyServiceRegister() {
               <div className="g2 mb12">
                 <div className="field">
                   <label>पंजीकरण मिति</label>
-                  <input className="inp" value={f.panjMiti} onChange={hc("panjMiti")} />
+                  <input
+                    className="inp"
+                    value={f.panjMiti}
+                    onChange={hc("panjMiti")}
+                  />
                 </div>
                 <div className="field">
                   <label>पंजीकरण समय</label>
-                  <input className="inp" type="time" value={f.panjSamay} onChange={hc("panjSamay")} />
+                  <input
+                    className="inp"
+                    type="time"
+                    value={f.panjSamay}
+                    onChange={hc("panjSamay")}
+                  />
                 </div>
               </div>
 
@@ -294,8 +513,18 @@ export default function EmergencyServiceRegister() {
               <div className="field mb12">
                 <label>पुरा नाम</label>
                 <div className="g2">
-                  <input className="inp" placeholder="First & Middle Name" value={f.firstName} onChange={hc("firstName")} />
-                  <input className="inp" placeholder="Family Name" value={f.familyName} onChange={hc("familyName")} />
+                  <input
+                    className="inp"
+                    placeholder="First & Middle Name"
+                    value={f.firstName}
+                    onChange={hc("firstName")}
+                  />
+                  <input
+                    className="inp"
+                    placeholder="Family Name"
+                    value={f.familyName}
+                    onChange={hc("familyName")}
+                  />
                 </div>
               </div>
 
@@ -303,16 +532,28 @@ export default function EmergencyServiceRegister() {
               <div className="g2 mb12">
                 <div className="field">
                   <label>जाती</label>
-                  <select className="sel" value={f.jaati} onChange={hc("jaati")}>
+                  <select
+                    className="sel"
+                    value={f.jaati}
+                    onChange={hc("jaati")}
+                  >
                     <option value="">Select Caste</option>
-                    {CASTE_OPT.map((o) => <option key={o}>{o}</option>)}
+                    {CASTE_OPT.map((o) => (
+                      <option key={o}>{o}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="field">
                   <label>लिङ्ग</label>
-                  <select className="sel" value={f.linga} onChange={hc("linga")}>
+                  <select
+                    className="sel"
+                    value={f.linga}
+                    onChange={hc("linga")}
+                  >
                     <option value="">Select Gender</option>
-                    {GENDER_OPT.map((o) => <option key={o}>{o}</option>)}
+                    {GENDER_OPT.map((o) => (
+                      <option key={o}>{o}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -321,9 +562,15 @@ export default function EmergencyServiceRegister() {
               <div className="g2 mb12">
                 <div className="field">
                   <label>उमेर समूह</label>
-                  <select className="sel" value={f.umerSamuh} onChange={hc("umerSamuh")}>
+                  <select
+                    className="sel"
+                    value={f.umerSamuh}
+                    onChange={hc("umerSamuh")}
+                  >
                     <option value="">Select Age Group</option>
-                    {AGE_GROUP_OPT.map((o) => <option key={o}>{o}</option>)}
+                    {AGE_GROUP_OPT.map((o) => (
+                      <option key={o}>{o}</option>
+                    ))}
                   </select>
                 </div>
                 <div className="field">
@@ -335,9 +582,16 @@ export default function EmergencyServiceRegister() {
               {/* Jilla */}
               <div className="field mb12">
                 <label>जिल्ला</label>
-                <select className="sel" value={f.jilla} onChange={hc("jilla")} style={{ maxWidth: 220 }}>
+                <select
+                  className="sel"
+                  value={f.jilla}
+                  onChange={hc("jilla")}
+                  style={{ maxWidth: 220 }}
+                >
                   <option value="">Select District</option>
-                  {DISTRICT_OPT.map((o) => <option key={o}>{o}</option>)}
+                  {DISTRICT_OPT.map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </div>
 
@@ -357,11 +611,19 @@ export default function EmergencyServiceRegister() {
               <div className="g2">
                 <div className="field">
                   <label>पालनहरूको नाम</label>
-                  <input className="inp" value={f.palakNaam} onChange={hc("palakNaam")} />
+                  <input
+                    className="inp"
+                    value={f.palakNaam}
+                    onChange={hc("palakNaam")}
+                  />
                 </div>
                 <div className="field">
                   <label>पालनहरूको सम्पर्क नम्बर</label>
-                  <input className="inp" value={f.palakSamparka} onChange={hc("palakSamparka")} />
+                  <input
+                    className="inp"
+                    value={f.palakSamparka}
+                    onChange={hc("palakSamparka")}
+                  />
                 </div>
               </div>
             </div>
@@ -373,42 +635,91 @@ export default function EmergencyServiceRegister() {
               {/* Self Admission + Brought Dead */}
               <div className="cb-row mb12">
                 <label className="cb-item">
-                  <input type="checkbox" checked={f.selfAdmission} onChange={hc("selfAdmission")} />
+                  <input
+                    type="checkbox"
+                    checked={f.selfAdmission}
+                    onChange={hc("selfAdmission")}
+                  />
                   Self Admission
                 </label>
                 <label className="cb-item">
-                  <input type="checkbox" checked={f.broughtDead} onChange={hc("broughtDead")} />
+                  <input
+                    type="checkbox"
+                    checked={f.broughtDead}
+                    onChange={hc("broughtDead")}
+                  />
                   Brought Dead
                 </label>
               </div>
 
               {/* Referring Org */}
               <div className="field mb14">
-                <input className="inp" placeholder="Referring Organization" value={f.referringOrg} onChange={hc("referringOrg")} />
+                <input
+                  className="inp"
+                  placeholder="Referring Organization"
+                  value={f.referringOrg}
+                  onChange={hc("referringOrg")}
+                />
               </div>
 
               {/* Dynamic tables */}
-              <DynTable label="लक्षण र लक्षणहरू"       rows={lakshan}    setter={setLakshan}    colLabel="संकेत र लक्षण" />
-              <DynTable label="प्रवेशमा मुख्य शिकायतहरू" rows={complaints} setter={setComplaints} colLabel="मुख्य शिकायत" />
-              <DynTable label="अन्वेषणहरू"               rows={anweshan}   setter={setAnweshan}   colLabel="अन्वेषण" />
-              <DynTable label="निदान"                    rows={nidaan}     setter={setNidaan}     colLabel="निदान" />
+              <DynTable
+                label="लक्षण र लक्षणहरू"
+                rows={lakshan}
+                setter={setLakshan}
+                colLabel="संकेत र लक्षण"
+              />
+              <DynTable
+                label="प्रवेशमा मुख्य शिकायतहरू"
+                rows={complaints}
+                setter={setComplaints}
+                colLabel="मुख्य शिकायत"
+              />
+              <DynTable
+                label="अन्वेषणहरू"
+                rows={anweshan}
+                setter={setAnweshan}
+                colLabel="अन्वेषण"
+              />
+              <DynTable
+                label="निदान"
+                rows={nidaan}
+                setter={setNidaan}
+                colLabel="निदान"
+              />
 
               {/* Rog */}
               <div className="field mb10" style={{ marginTop: 14 }}>
                 <label>रोग</label>
                 <select className="sel" value={f.rog} onChange={hc("rog")}>
                   <option value="">Select Disease</option>
-                  {DISEASE_OPT.map((o) => <option key={o}>{o}</option>)}
+                  {DISEASE_OPT.map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </div>
 
-              <DynTable label="उपचार"              rows={upachar}  setter={setUpachar}  colLabel="उपचार" />
-              <DynTable label="औषधि सिफारिस गारिएको" rows={aushadhi} setter={setAushadhi} colLabel="औषधि सिफारिस गारिएको" />
+              <DynTable
+                label="उपचार"
+                rows={upachar}
+                setter={setUpachar}
+                colLabel="उपचार"
+              />
+              <DynTable
+                label="औषधि सिफारिस गारिएको"
+                rows={aushadhi}
+                setter={setAushadhi}
+                colLabel="औषधि सिफारिस गारिएको"
+              />
 
               {/* Avalokan */}
               <div className="cb-row" style={{ marginTop: 12 }}>
                 <label className="cb-item">
-                  <input type="checkbox" checked={f.avalokan} onChange={hc("avalokan")} />
+                  <input
+                    type="checkbox"
+                    checked={f.avalokan}
+                    onChange={hc("avalokan")}
+                  />
                   अवलोकनमा राखिएको
                 </label>
               </div>
@@ -417,20 +728,41 @@ export default function EmergencyServiceRegister() {
 
           {/* ── DISCHARGE SECTION ── */}
           <div className="full-card">
-            <div className="panel-title" style={{ marginBottom: 16 }}>डिस्चार्ज सूचना</div>
+            <div className="panel-title" style={{ marginBottom: 16 }}>
+              डिस्चार्ज सूचना
+            </div>
 
             <div className="dis-grid mb12">
               <div className="field">
                 <label>डिस्चार्ज मिति</label>
-                <input className="inp" value={f.disMiti} onChange={hc("disMiti")} />
+                <input
+                  className="inp"
+                  value={f.disMiti}
+                  onChange={hc("disMiti")}
+                />
               </div>
               <div className="field">
                 <label>डिस्चार्ज समय</label>
-                <input className="inp" type="time" value={f.disSamay} onChange={hc("disSamay")} />
+                <input
+                  className="inp"
+                  type="time"
+                  value={f.disSamay}
+                  onChange={hc("disSamay")}
+                />
               </div>
-              <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: 2 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-end",
+                  paddingBottom: 2,
+                }}
+              >
                 <label className="cb-item">
-                  <input type="checkbox" checked={f.rogiMrityu} onChange={hc("rogiMrityu")} />
+                  <input
+                    type="checkbox"
+                    checked={f.rogiMrityu}
+                    onChange={hc("rogiMrityu")}
+                  />
                   रोगी मृत्यु भएको छ
                 </label>
               </div>
@@ -439,41 +771,71 @@ export default function EmergencyServiceRegister() {
             <div className="g3 mb12">
               <div className="field">
                 <label>परिणाम</label>
-                <select className="sel" value={f.parinam} onChange={hc("parinam")}>
+                <select
+                  className="sel"
+                  value={f.parinam}
+                  onChange={hc("parinam")}
+                >
                   <option value="">Select Outcome</option>
-                  {OUTCOME_OPT.map((o) => <option key={o}>{o}</option>)}
+                  {OUTCOME_OPT.map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </div>
               <div className="field">
                 <label>लागत मुक्ति</label>
-                <select className="sel" value={f.lagatMukti} onChange={hc("lagatMukti")}>
+                <select
+                  className="sel"
+                  value={f.lagatMukti}
+                  onChange={hc("lagatMukti")}
+                >
                   <option value="">Select Cost Exemption</option>
-                  {COST_EXEMPT_OPT.map((o) => <option key={o}>{o}</option>)}
+                  {COST_EXEMPT_OPT.map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </div>
               <div className="field">
                 <label>कुल लागत मुक्ति</label>
-                <input className="inp" value={f.kulLagatMukti} onChange={hc("kulLagatMukti")} />
+                <input
+                  className="inp"
+                  value={f.kulLagatMukti}
+                  onChange={hc("kulLagatMukti")}
+                />
               </div>
             </div>
 
             <div className="g2 mb12" style={{ maxWidth: 500 }}>
               <div className="field">
                 <label>लागत मुक्ति समूह</label>
-                <select className="sel" value={f.lagatMuktiSamuh} onChange={hc("lagatMuktiSamuh")}>
+                <select
+                  className="sel"
+                  value={f.lagatMuktiSamuh}
+                  onChange={hc("lagatMuktiSamuh")}
+                >
                   <option value="">Select Cost Exemption Group</option>
-                  {COST_GROUP_OPT.map((o) => <option key={o}>{o}</option>)}
+                  {COST_GROUP_OPT.map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </div>
             </div>
 
             <div className="cb-row">
               <label className="cb-item">
-                <input type="checkbox" checked={f.laiangikHinsa} onChange={hc("laiangikHinsa")} />
+                <input
+                  type="checkbox"
+                  checked={f.laiangikHinsa}
+                  onChange={hc("laiangikHinsa")}
+                />
                 लैंगिक हिंसा
               </label>
               <label className="cb-item">
-                <input type="checkbox" checked={f.pulisKes} onChange={hc("pulisKes")} />
+                <input
+                  type="checkbox"
+                  checked={f.pulisKes}
+                  onChange={hc("pulisKes")}
+                />
                 पुलिसको केस
               </label>
             </div>
@@ -481,9 +843,18 @@ export default function EmergencyServiceRegister() {
 
           {/* Submit */}
           <div className="submit-wrap">
-            <button type="submit" className="btn-sub">बुझाउनुहोस्</button>
+            <button
+              type="submit"
+              className="btn-sub"
+              disabled={loading}
+              style={{
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+            >
+              {loading ? "Saving..." : "बुझाउनुहोस्"}
+            </button>
           </div>
-
         </form>
       </div>
     </>
